@@ -1,8 +1,4 @@
-urlpatterns = [
-    path("routes/", views.getRoutes, name="routes"),
-    path("<uuid:pk>/", views.getRestaurant, name="restaurant"),
-    path("", views.getRestaurants, name="restaurants"),
-]# Swiggy clone
+# Swiggy clone
 ## A food ordering app clone using Python/Django on the backend, Vuejs on the frontend and PostgresQL for the database
 
 ## Stack Used
