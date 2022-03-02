@@ -2,57 +2,73 @@
 ## A food ordering app clone using Python/Django on the backend, Vuejs on the frontend and PostgresQL for the database
 
 ## Stack Used
--Python
--Django
--Vuejs
--Postgres
+<ul>
+  <li>Python</li>
+  <li>Django</li>
+  <li>Vuew</li>
+  <li>Postgres</li>
+</ul>
 
 ## Setup
 You will need to install Python, Django, Vuejs, VueCLI and Postgres on your local computer. The links below will bring you to the respective site to help you get started with the installation. You can use npm or yarn depending on your preference. Please select the installation options that are best suited for your local computer.
 
 ### Installation links
--[Node](https://nodejs.org/en/download/) This is if you want to use NPM. You will need to download Nodejs first
--[NPM](https://docs.npmjs.com/cli/v8/commands/npm-install)
--[Yarn](https://classic.yarnpkg.com/lang/en/docs/cli/install/)
--[Python](https://www.python.org/downloads/)
--[Django](https://docs.djangoproject.com/en/4.0/topics/install/)
--[Vue](https://vuejs.org/guide/quick-start.html) This is for version 3
--[Vue CLI](https://cli.vuejs.org/guide/installation.html)
--[Postgres](https://www.postgresql.org/download/)
--[Visual Studio](https://visualstudio.microsoft.com/downloads/)
--[PyCharm](https://www.jetbrains.com/help/pycharm/installation-guide.html)
+<ul>
+  <li>[Node](https://nodejs.org/en/download/) This is if you want to use NPM. You will need to download Nodejs first</li>
+  <li>[NPM](https://docs.npmjs.com/cli/v8/commands/npm-install)</li>
+  <li>[Yarn](https://classic.yarnpkg.com/lang/en/docs/cli/install/)</li>
+  <li>[Python](https://www.python.org/downloads/)</li>
+  <li>[Django](https://docs.djangoproject.com/en/4.0/topics/install/)</li>
+  <li>[Vue](https://vuejs.org/guide/quick-start.html) This is for version 3</li>
+  <li>[Vue CLI](https://cli.vuejs.org/guide/installation.html)</li>
+  <li>[Postgres](https://www.postgresql.org/download/)</li>
+  <li>[Visual Studio](https://visualstudio.microsoft.com/downloads/)</li>
+  <li>[PyCharm](https://www.jetbrains.com/help/pycharm/installation-guide.html)</li>
+</ul>
 
 ### Folder structure
 This is a folder structure of how I have put this project together. This is subject to change and you can make it how you see fit depending on modifications or alterations you want to have beyond what I have done.
 
-|--swiggy
-  |--server
-    |--apps
-      |--discount
-      |--menu
-      |--restaurants
-      |--userinfo
-      |--utils
-      __init__.py
-    |--config
-      .env
-      __init__.py
-      asgi.py
-      settings.py
-      urls.py
-      wsgi.py
-    |--venv
-    .gitignore
-    main.py
-    manage.py
-  |--client
-    |--node_modules
-    |--public
-    |--src
-    .gitignore
-    babel.config.js
-    package.json
-    yarn.lock
+<ul>
+  <li>|--swiggy</li>
+  <ul>
+    <li>|--server</li>
+      <ul>
+        <li>|--apps</li>
+        <ul>
+          <li>|--discount</li>
+          <li>|--menu</li>
+          <li>|--restaurants</li>
+          <li>|--userinfo</li>
+          <li>|--utils</li>
+          <li>__init__.py</li>
+        </ul>
+        <li>|--config</li>
+        <ul>
+          <li>.env</li>
+          <li>__init__.py</li>
+          <li>asgi.py</li>
+          <li>settings.py</li>
+          <li>urls.py</li>
+          <li>wsgi.py</li>
+        </ul>
+        <li>|--venv</li>
+        <li>.gitignore</li>
+        <li>main.py</li>
+        <li>manage.py</li>
+      </ul>
+    <li>|--client</li>
+      <ul>
+        <li>|--node_modules</li>
+        <li>|--public</li>
+        <li>|--src</li>
+        <li>.gitignore</li>
+        <li>babel.config.js</li>
+        <li>package.json</li>
+        <li>yarn.lock</li>
+      </ul>
+  </ul>
+</ul>
     
 ### gitignore files
 An easy way to get the needed info within the gitignore files is to use the website [Toptal](https://www.toptal.com/developers/gitignore). All you need to do is type in the stack that you are using and it will have all the files that need to be hidden. You can copy and paste it to your gitignore files as needed.
