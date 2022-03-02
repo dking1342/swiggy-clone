@@ -422,5 +422,26 @@ urlpatterns = [
 ]
 ```
 
+### Frontend Setup
+This part of the project is done using Visual Studio Code as the text editor. You can use whichever IDE or text editor that you prefer. We will also be usng the CLI for Vue. 
+
+#### Vue CLI Configuration
+If you have not installed Vue CLI on your computer, then do that first. The link is in the first steps of this documentation. Open a terminal and navigate to the root folder (swiggy) then type the command:
+
+```
+vue create client
+```
+
+After Vue starts to install the subfolders it will ask you to select various options of how you want Vue to be configured. These include which version, styling, etc options.
+
+You can then run the server by typing this command into the terminal window. The default port used is 8080, but this can be changed depending on your preference. Once you type on the command you can go to your browser and type <code>localhost:8080</code> to have the default view render.
+
+```
+npm run serve
+
+OR
+
+yarn serve
+```
 
 
