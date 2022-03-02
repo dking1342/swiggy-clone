@@ -1,5 +1,5 @@
 # Swiggy clone
-## A food ordering app clone using Python/Django on the backend, Vuejs on the frontend and PostgresQL for the database
+<i>A food ordering app clone using Python/Django on the backend, Vuejs on the frontend and PostgresQL for the database</i>
 
 ## Stack Used
 <ul>
@@ -422,10 +422,10 @@ urlpatterns = [
 ]
 ```
 
-### Frontend Setup
+## Frontend Setup
 This part of the project is done using Visual Studio Code as the text editor. You can use whichever IDE or text editor that you prefer. We will also be usng the CLI for Vue. 
 
-#### Vue CLI Configuration
+### Vue CLI Configuration
 If you have not installed Vue CLI on your computer, then do that first. The link is in the first steps of this documentation. Open a terminal and navigate to the root folder (swiggy) then type the command:
 
 ```
