@@ -23,7 +23,9 @@ class Restaurant(models.Model):
     restaurant_cuisines = ArrayField(models.CharField(max_length=20, blank=True), size=20)
     restaurant_main_img = models.URLField(max_length=200, default="")
     discount_isValid = models.BooleanField(default=False)
-    discounts = models.ManyToManyField(Discount)
+    discounts = models.ForeignKey(Discount, on_delete=models.PROTECT, related_name="discounts")
+    restaurant_cost = models.IntegerField(null=False, default=0)
+    restaurant_rating = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
     restaurant_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

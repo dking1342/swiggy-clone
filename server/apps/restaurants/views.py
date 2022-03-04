@@ -1,6 +1,7 @@
 from datetime import datetime
 import http
 
+from django.db import connection
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -58,7 +59,13 @@ response_object = {
 
 @api_view(['GET'])
 def getRestaurants(request):
-    restaurants = Restaurant.objects.all()
+    # with connection.cursor() as cursor:
+    #     cursor.execute("SELECT * FROM restaurants_restaurant INNER JOIN discount_discount ON restaurants_restaurant.discounts_id = discount_discount.discount_id")
+    #     row = cursor.fetchone()
+    #     print(row)
+    # return Response(row)
+
+    restaurants = Restaurant.objects.raw('SELECT * FROM restaurants_restaurant INNER JOIN discount_discount ON restaurants_restaurant.discounts_id = discount_discount.discount_id')
     serializer = RestaurantSerializer(restaurants, many=True)
     response_object.update(
         timestamp=datetime.now(),
