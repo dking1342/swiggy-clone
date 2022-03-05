@@ -17,7 +17,7 @@ export interface FetchResponse<T> {
     status:string,
     status_code:string,
     message:string,
-    data:[T]
+    data:T[]
 }
 
 export interface Restaurant<T> {
@@ -43,6 +43,11 @@ export interface Discount {
     discount_text:string,
     discount_amount:number,
     discount_created:Date
+}
+
+export interface Cuisine {
+    cuisine_id:string,
+    cuisine_name:string
 }
 
 
@@ -79,4 +84,42 @@ export const placeholderFetch:ResponseAppState<FetchResponse<Restaurant<Discount
     },
     error:""
 }
+
+export const placeholderCuisineFetch:ResponseAppState<FetchResponse<Cuisine>> = {
+    dataState:DATASTATE.loading,
+    appData:{
+        timestamp:new Date(),
+        status:"",
+        status_code:"",
+        message:"",
+        data:[{
+            cuisine_id:"",
+            cuisine_name:""
+        }]
+    },
+    error:""
+}
+
+export const placeholderRestaurant:Restaurant<Discount>[] = [{
+    restaurant_id:"",
+    restaurant_name:"",
+    restaurant_address_1:"",
+    restaurant_address_2:"",
+    restaurant_city:"",
+    restaurant_zip_code:"",
+    restaurant_state:"",
+    restaurant_cuisines:[""],
+    restaurant_main_img:"",
+    discount_isValid:false,
+    discounts:{
+        discount_id:"",
+        discount_code:"",
+        discount_text:"",
+        discount_amount:0,
+        discount_created:new Date()
+    },
+    restaurant_cost:0,
+    restaurant_rating:0.0,
+    restaurant_created:new Date()
+}]
 

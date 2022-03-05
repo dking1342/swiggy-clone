@@ -31,7 +31,7 @@
                 </div>
                 <div class="card-header">
                     <h1>{{ restaurant.restaurant_name }}</h1>
-                    <h2>{{ restaurant.restaurant_cuisines.toString() }}</h2>
+                    <h2>{{ restaurant.restaurant_cuisines.join(", ") }}</h2>
                 </div>
                 <div class="card-body">
                     <div v-if="Number(restaurant.restaurant_rating) === 0.0" :class="[restaurant.restaurant_rating < 4 ? 'card-body-low-rating' : 'card-body-high-rating']">⭐️ --</div>
@@ -48,7 +48,7 @@
         <!-- todo make a 404 page -->
         {{ htmlOutput.error }}
     </section>
-    <div class="filter-overlay">
+    <div class="filter-overlay" v-if="cuisineList.dataState === 'SUCCESS' && cuisineList.appData.data.length">
         <aside class="filter-modal">
             <div class="filter-header">
                 <button @click="toggleFilterModal">X</button>
@@ -57,162 +57,22 @@
             <div class="filter-body">
                 <h1>Cuisines</h1>
                 <div class="filter-form">
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">American</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
-                    </div>
-                    <div class="form-field">
-                        <input type="checkbox" name="American" id="">
-                        <label for="american">Indian</label>
+                    <div class="form-field" v-for="cuisine in cuisineList.appData.data" :key="cuisine.cuisine_id">
+                        <input type="checkbox" :name="cuisine.cuisine_name">
+                        <label :for="cuisine.cuisine_name">{{ cuisine.cuisine_name }}</label>
                     </div>
                 </div>
             </div>
             <div class="filter-selection">
-                <button>Clear</button>
-                <button>Show Restaurants</button>
+                <button @click="clearFilter">Clear</button>
+                <button @click="filterCuisines">Show Restaurants</button>
             </div>
         </aside>
     </div>
 </template>
 
 <script lang="ts">
-import { DATASTATE, FetchResponse, ResponseAppState, Restaurant,placeholderFetch, Discount } from '../types/fetch-types';
+import { DATASTATE, FetchResponse, ResponseAppState, Restaurant,placeholderFetch, Discount, Cuisine, placeholderCuisineFetch } from '../types/fetch-types';
 import { defineComponent, onMounted, ref } from 'vue';
 
 
@@ -221,12 +81,22 @@ export default defineComponent({
         let isModalShowing = true;
         let fetchResult:ResponseAppState<FetchResponse<Restaurant<Discount>>> = placeholderFetch;
         let htmlOutput = ref(placeholderFetch);
+        let cuisineFetchResult:ResponseAppState<FetchResponse<Cuisine>> = placeholderCuisineFetch;
+        let cuisineList = ref(placeholderCuisineFetch);
         let restaurantCount = ref(0);
 
         const sortRestaurants = (e:any) => {
             let elementText = e.target.parentElement.textContent;
             let elementTextContent = e.target.parentElement.textContent.toLowerCase();
             sortHelper(elementText,elementTextContent);
+            
+            // set select element index value
+            let selectElement = document.querySelector('.link-dropdown') as HTMLSelectElement;
+            selectElement.childNodes.forEach((element,i)=>{
+                if(element.textContent === elementText){
+                    selectElement.selectedIndex = i;
+                }
+            })
         }
 
         const sortRestaurantsDropdown = (e:any) => {
@@ -268,6 +138,66 @@ export default defineComponent({
             console.log(id);
         }
 
+        const clearFilter = () => {
+            // unchecks all inputs
+            document.querySelectorAll('.form-field').forEach((item)=>{
+                let inputElement = item.firstElementChild as HTMLInputElement;
+                if(inputElement.checked){
+                    inputElement.checked = false;
+                }                
+            });
+
+            // resets the restaurant list
+            htmlOutput.value = fetchResult;
+            restaurantCount.value = htmlOutput.value.appData?.data.length!;
+        }
+
+        const filterCuisines = () => {
+            // loops through all cuisine choices and filters checked inputs
+            let inputArray:string[] = [...document.querySelectorAll('.form-field')].reduce((acc:string[],val)=>{
+                let inputElement = val.firstElementChild as HTMLInputElement;
+                if(inputElement.checked){
+                    return [...acc,inputElement.name]
+                } else {
+                    return acc
+                }
+            },[]);
+
+            // filtering out restaurant to include checked items
+            let filteredArray = fetchResult.appData?.data.reduce((acc:Restaurant<Discount>[],val)=>{
+                inputArray.forEach(input=>{
+                    if(val.restaurant_cuisines.includes(input)){
+                        // check to see if filterArray already has the restaurant
+                        if(!acc.find(fil=>fil === val)){
+                            acc = [...acc,val];
+                        } 
+                    } 
+                });
+                return acc;
+            },[]);
+
+            // new object to populate the restaurant list
+            if(filteredArray!.length){
+                let newSearchResult = fetchResult;
+                newSearchResult = {
+                    ...newSearchResult,
+                    appData:{
+                        ...newSearchResult.appData!,
+                        data:filteredArray!
+                    }
+                }
+                // reset restaurant list and count
+                htmlOutput.value = newSearchResult;
+                restaurantCount.value = htmlOutput.value.appData?.data.length!;
+
+                // close filter sidebar
+                toggleFilterModal();
+            } else {
+                toggleFilterModal();
+            }
+
+        }
+
         const getRestaurants = async() => {
             fetchResult = {
                 ...fetchResult,
@@ -286,7 +216,6 @@ export default defineComponent({
                 }
                 htmlOutput.value = fetchResult;
                 restaurantCount.value = fetchResult.appData!.data.length;
-                console.log(fetchResult);
 
             } catch (error:any) {
                 fetchResult = {
@@ -295,6 +224,35 @@ export default defineComponent({
                     error
                 }
                 htmlOutput.value = fetchResult;
+            }
+        }
+
+        const getCuisines = async() => {
+            cuisineFetchResult = {
+                ...cuisineFetchResult,
+                dataState:DATASTATE.loading
+            }
+            cuisineList.value = cuisineFetchResult;
+            try {
+                const response = await fetch("http://localhost:8000/api/v1/cuisines");
+                const data:FetchResponse<Cuisine> = await response.json();
+
+                cuisineFetchResult = {
+                    ...cuisineFetchResult,
+                    dataState:DATASTATE.success,
+                    appData:data,
+                    error:""
+                }
+                cuisineList.value = cuisineFetchResult;
+
+            } catch (error:any) {
+                cuisineFetchResult = {
+                    ...cuisineFetchResult,
+                    dataState:DATASTATE.error,
+                    error
+                }
+                cuisineList.value = cuisineFetchResult;
+                
             }
         }
 
@@ -333,6 +291,7 @@ export default defineComponent({
         // lifecycle hooks
         onMounted(()=>{
             getRestaurants();
+            getCuisines();
         });
 
         return {
@@ -342,7 +301,10 @@ export default defineComponent({
             fetchResult,
             htmlOutput,
             navigateUser,
-            restaurantCount
+            restaurantCount,
+            cuisineList,
+            clearFilter,
+            filterCuisines,
         }
     }
 })

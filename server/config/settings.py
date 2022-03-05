@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'apps.discount',
     'apps.menu',
     'apps.userinfo',
+    'apps.cuisines',
 ]
 
 REST_FRAMEWORK = {
