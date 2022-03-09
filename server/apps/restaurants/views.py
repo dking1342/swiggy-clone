@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 import http
 
@@ -58,7 +59,8 @@ response_object = {
 
 @api_view(['GET'])
 def getRestaurants(request):
-    restaurants = Restaurant.objects.raw('SELECT * FROM restaurants_restaurant INNER JOIN discount_discount ON restaurants_restaurant.discounts_id = discount_discount.discount_id')
+    restaurants = Restaurant.objects.raw(
+        'SELECT * FROM restaurants_restaurant INNER JOIN discount_discount ON restaurants_restaurant.discounts_id = discount_discount.discount_id')
     serializer = RestaurantSerializer(restaurants, many=True)
     response_object.update(
         timestamp=datetime.now(),
@@ -73,30 +75,28 @@ def getRestaurants(request):
 @api_view(['GET'])
 def getRestaurant(request, pk):
     try:
-        restaurant = Restaurant.objects.get(id=pk)
+        restaurant = Restaurant.objects.raw(
+            'SELECT * FROM restaurants_restaurant INNER JOIN discount_discount ON restaurants_restaurant.discounts_id = discount_discount.discount_id')
+        filtered_restaurant = []
+        for r in restaurant:
+            if r.restaurant_id == pk:
+                filtered_restaurant.append(r)
+
+        if len(filtered_restaurant):
+            serializer = RestaurantSerializer(filtered_restaurant[0], many=False)
+            response_object.update(
+                timestamp=datetime.now(),
+                status=http.HTTPStatus.OK.name,
+                status_code=http.HTTPStatus.OK.value,
+                message='Returning restaurant with id: {0}'.format(pk),
+                data=[serializer.data]
+            )
+            return Response(response_object)
+        else:
+            raise Http404
+
     except:
+        print("something went wrong")
         raise Http404
-
-    serializer = RestaurantSerializer(restaurant, many=False)
-    response_object.update(
-        timestamp=datetime.now(),
-        status=http.HTTPStatus.OK.name,
-        status_code=http.HTTPStatus.OK.value,
-        message='Returning restaurant with id: {0}'.format(pk),
-        data=[serializer.data]
-    )
-
-    return Response(response_object)
-
-
-# @api_view(['POST'])
-# def createRestaurant(request):
-#     data = request.data
-#     serializer = RestaurantSerializer(data=data)
-#
-#     if serializer.is_valid():
-#         serializer.save()
-#
-#     return Response(serializer.data)
 
 

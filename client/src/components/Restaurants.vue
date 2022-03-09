@@ -13,10 +13,10 @@
                 <option value="Lowest cost">Lowest Cost</option>
                 <option value="Highest cost">Highest Cost</option>
             </select>
-            <span class="link-wrapper"><router-link to="/" class="header-search" @click="sortRestaurants">Discounts</router-link></span>
-            <span class="link-wrapper"><router-link to="/" class="header-search" @click="sortRestaurants">Rating</router-link></span>
-            <span class="link-wrapper"><router-link to="/" class="header-search" @click="sortRestaurants">Lowest Cost</router-link></span>
-            <span class="link-wrapper"><router-link to="/" class="header-search" @click="sortRestaurants">Highest Cost</router-link></span>
+            <span class="link-wrapper"><router-link to="#" class="header-search" @click="sortRestaurants">Discounts</router-link></span>
+            <span class="link-wrapper"><router-link to="#" class="header-search" @click="sortRestaurants">Rating</router-link></span>
+            <span class="link-wrapper"><router-link to="#" class="header-search" @click="sortRestaurants">Lowest Cost</router-link></span>
+            <span class="link-wrapper"><router-link to="#" class="header-search" @click="sortRestaurants">Highest Cost</router-link></span>
             <button @click="toggleFilterModal">Filter 🎛</button>
         </div>
     </header>
@@ -74,6 +74,7 @@
 <script lang="ts">
 import { DATASTATE, FetchResponse, ResponseAppState, Restaurant,placeholderFetch, Discount, Cuisine, placeholderCuisineFetch } from '../types/fetch-types';
 import { defineComponent, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 
 export default defineComponent({
@@ -84,19 +85,21 @@ export default defineComponent({
         let cuisineFetchResult:ResponseAppState<FetchResponse<Cuisine>> = placeholderCuisineFetch;
         let cuisineList = ref(placeholderCuisineFetch);
         let restaurantCount = ref(0);
+        let router = useRouter();
 
         const sortRestaurants = (e:any) => {
             let elementText = e.target.parentElement.textContent;
             let elementTextContent = e.target.parentElement.textContent.toLowerCase();
-            sortHelper(elementText,elementTextContent);
+            sortHelper(elementText,elementTextContent);  
             
             // set select element index value
             let selectElement = document.querySelector('.link-dropdown') as HTMLSelectElement;
             selectElement.childNodes.forEach((element,i)=>{
-                if(element.textContent === elementText){
+                if(element.textContent === elementTextContent){
                     selectElement.selectedIndex = i;
                 }
             })
+
         }
 
         const sortRestaurantsDropdown = (e:any) => {
@@ -135,7 +138,12 @@ export default defineComponent({
         }
 
         const navigateUser = (id:string) => {
-            console.log(id);
+            router.push({
+                name:"Restaurant",
+                params:{
+                    id
+                }
+            })
         }
 
         const clearFilter = () => {

@@ -32,11 +32,14 @@ export default defineComponent({
 a{
   text-decoration: none;
 }
+button{
+  cursor: pointer;
+}
 main{
   height: 100%;
   width: 100%;
   overflow-y: scroll;
-  margin-top: 110px;
+  margin-top: 95px;
   padding:0 5%;
   z-index: -1;
 }

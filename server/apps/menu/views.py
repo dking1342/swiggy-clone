@@ -11,7 +11,7 @@ from apps.menu.serializers import MenuSerializer
 
 # Create your views here.
 @api_view(['GET'])
-def getRoutes(request):
+def get_routes(request):
     routes = [
         {
             'Endpoint': 'menu/',
@@ -57,7 +57,7 @@ response_object = {
 
 
 @api_view(['GET'])
-def getMenus(request):
+def get_menus(request):
     menus = Menu.objects.all()
     serializer = MenuSerializer(menus, many=True)
     response_object.update(
@@ -71,7 +71,7 @@ def getMenus(request):
 
 
 @api_view(['GET'])
-def getMenu(request, pk):
+def get_menu(request, pk):
     try:
         menu = Menu.objects.get(id=pk)
     except:
@@ -86,3 +86,29 @@ def getMenu(request, pk):
     )
 
     return Response(response_object)
+
+
+@api_view(['GET'])
+def get_menu_restaurant(request, pk):
+    try:
+        menu = Menu.objects.all()
+        filtered_menu = []
+        for m in menu:
+            if m.restaurant.restaurant_id == pk:
+                filtered_menu.append(m)
+
+        if len(filtered_menu):
+            serializer = MenuSerializer(filtered_menu,many=True)
+            response_object.update(
+                timestamp=datetime.now(),
+                status=http.HTTPStatus.OK.name,
+                status_code=http.HTTPStatus.OK.value,
+                message='Returning menu with restaurant id: {0}'.format(pk),
+                data=serializer.data
+            )
+            return Response(response_object)
+        else:
+            raise Http404
+    except:
+        print("error happened")
+        raise Http404
