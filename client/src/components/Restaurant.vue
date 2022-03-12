@@ -42,7 +42,16 @@
             <div class="header-search-container">
                 <div class="form-field">
                     <span>🔎</span>
-                    <input autocomplete="off" id="search" type="text" name="search" placeholder="Search for dishes" @keyup="userFilterInput($event)">
+                    <input 
+                        autocomplete="off" 
+                        id="search" 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search for dishes" 
+                        maxlength="35"
+                        v-model="userFilter" 
+                        @keyup="userFilterInput"
+                    >
                     <button @click="clearSearch()">X</button>
                 </div>
             </div>
@@ -73,64 +82,64 @@
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category === 'BR').length">
                         <MenuCategories 
-                        v-bind="breakfastProps"
-                        @decreaseOrder="decreaseOrder"
-                        @addOrder="addOrder"
-                        @userOrderChoice="userOrderChoice"
+                            v-bind="breakfastProps"
+                            @decreaseOrder="decreaseOrder"
+                            @addOrder="addOrder"
+                            @userOrderChoice="userOrderChoice"
                         />                        
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category === 'M').length">
                         <MenuCategories 
-                        v-bind="mainProps"
-                        @decreaseOrder="decreaseOrder"
-                        @addOrder="addOrder"
-                        @userOrderChoice="userOrderChoice"
+                            v-bind="mainProps"
+                            @decreaseOrder="decreaseOrder"
+                            @addOrder="addOrder"
+                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='S').length">
                         <MenuCategories 
-                        v-bind="sideProps"
-                        @decreaseOrder="decreaseOrder"
-                        @addOrder="addOrder"
-                        @userOrderChoice="userOrderChoice"
+                            v-bind="sideProps"
+                            @decreaseOrder="decreaseOrder"
+                            @addOrder="addOrder"
+                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='D').length">
                         <MenuCategories 
-                        v-bind="dessertsProps"
-                        @decreaseOrder="decreaseOrder"
-                        @addOrder="addOrder"
-                        @userOrderChoice="userOrderChoice"
+                            v-bind="dessertsProps"
+                            @decreaseOrder="decreaseOrder"
+                            @addOrder="addOrder"
+                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='B').length">
                         <MenuCategories 
-                        v-bind="beveragesProps"
-                        @decreaseOrder="decreaseOrder"
-                        @addOrder="addOrder"
-                        @userOrderChoice="userOrderChoice"
+                            v-bind="beveragesProps"
+                            @decreaseOrder="decreaseOrder"
+                            @addOrder="addOrder"
+                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                 </article>
                 <aside class="cart-container">
-                    <div class="cart-empty-container" v-if="!orderList.length">
+                    <div class="cart-empty-container" v-if="Boolean(!Object.keys(orderList).length)">
                         <h1>Cart Empty</h1>
                         <div class="cart-empty-img">
                             <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_480/Cart_empty_-_menu_2x_ejjkf2" alt="empty cart">
                         </div>
                         <p>Good food is always cooking! Go ahead, order some yummy items from the menu.</p>
                     </div>
-                    <div class="cart-full-container" v-else-if="orderList.length">
+                    <div class="cart-full-container" v-if="Boolean(Object.keys(orderList).length)">
                         <h1>Cart</h1>
                         <div class="cart-receipt-list">
-                            <div class="cart-receipt-list-item" v-for="order in orderList" :key="order.menu_id">
-                                <span class="cart-item-name">{{ order.menu_item }}</span>
+                            <div class="cart-receipt-list-item" v-for="order in orderList.order_item" :key="order.order_menu_id">
+                                <span class="cart-item-name">{{ order.order_menu_name }}</span>
                                 <div class="cart-receipt-toggle-btns">
-                                    <button class="cart-btn-decrease" @click="decreaseCart(order.menu_id)">-</button>
-                                    <span>{{ order.menu_orderQuantity }}</span>
-                                    <button class="cart-btn-add" @click="addCart(order.menu_id)">+</button>
+                                    <button class="cart-btn-decrease" @click="decreaseCart(order.order_menu_id)">-</button>
+                                    <span>{{ order.order_quantity }}</span>
+                                    <button class="cart-btn-add" @click="addCart(order.order_menu_id)">+</button>
                                 </div>
-                                <span class="cart-item-cost">${{ order.menu_price * order.menu_orderQuantity }}</span>
+                                <span class="cart-item-cost">${{ order.order_cost * order.order_quantity }}</span>
                             </div>
                         </div>
                         <div class="cart-receipt-total">
@@ -139,9 +148,9 @@
                                     <span>Subtotal</span>
                                     <span>Extra charges may apply</span>
                                 </div>
-                                <div class="cart-subtotal-cost">${{ cartSubtotal }}</div>
+                                <div class="cart-subtotal-cost">${{ orderList.cart_cost }}</div>
                             </div>
-                            <button class="cart-checkout-btn">Checkout</button>
+                            <button class="cart-checkout-btn" @click="checkout">Checkout</button>
                         </div>
                     </div>
                 </aside>
@@ -191,9 +200,9 @@
 </template>
 
 <script lang="ts">
-import { DATASTATE, Discount, FetchResponse, Menu, placeholderFetch, placeholderMenuFetch, ResponseAppState, Restaurant } from '@/types/fetch-types';
+import { DATASTATE, Discount, FetchResponse, Menu, Order, placeholderFetch, placeholderMenuFetch, placeholderOrder, ResponseAppState, Restaurant } from '@/types/fetch-types';
 import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import MenuCategories from '../components/MenuCategories.vue'
 
 export default defineComponent({
@@ -207,9 +216,10 @@ export default defineComponent({
         let fetchMenu:ResponseAppState<FetchResponse<Menu>> = placeholderMenuFetch;
         let menuList = ref(placeholderMenuFetch);
         let route = useRoute();
+        let router = useRouter();
         let restaurant_id = ref(route.params.id);
         let userFilter = ref("");
-        let orderList = ref([] as Menu[]);
+        let orderList = ref({} as Order);
 
         // component functions/methods
         const toggleView = () => {
@@ -226,8 +236,7 @@ export default defineComponent({
                 checkoutContainer.style.zIndex = "-10";
             }
         }
-        const userFilterInput = (e:any) => {
-            userFilter.value = e.target.value;
+        const userFilterInput = () => {
             let menu = document.querySelector('.menu-items-container') as HTMLDivElement;
             menu.scrollTo({
                 behavior:'smooth',
@@ -235,11 +244,30 @@ export default defineComponent({
             })
         }
         const userOrderChoice = (item:Menu) => {
-            item = {
-                ...item,
-                menu_orderQuantity:1
+            let order = {
+                order_menu_id:item.menu_id,
+                order_menu_name:item.menu_item,
+                order_quantity:1,
+                order_cost:item.menu_price,
+                restaurant:item.restaurant
             }
-            orderList.value.push(item);
+            let localState = localStorage.getItem('cart');
+            if(localState){
+                let currentState:Order = JSON.parse(localState);
+                currentState.order_item = [...currentState.order_item,order];
+                currentState.cart_quantity = currentState.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
+                currentState.cart_cost = currentState.order_item.reduce((acc,val)=> acc + (val.order_quantity * val.order_cost),0);
+                orderList.value = currentState;
+                localStorage.setItem('cart',JSON.stringify(currentState));                
+            } else {
+                let cart = placeholderOrder;
+                cart.order_item = [...cart.order_item,order];
+                cart.order_item = cart.order_item.filter(x=>x.order_menu_id);
+                cart.cart_quantity = cart.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
+                cart.cart_cost = cart.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
+                orderList.value = cart;
+                localStorage.setItem('cart',JSON.stringify(cart));
+            }
             let index:number = menuList.value.appData!.data.findIndex((x)=>x.menu_id === item.menu_id);
             menuList.value.appData!.data[index].menu_orderQuantity = 1;
         }
@@ -256,8 +284,6 @@ export default defineComponent({
         const decreaseCart = (id:string) => {
             let index:number = menuList.value.appData!.data.findIndex(x=>x.menu_id === id);
             let quantity:number = menuList.value.appData!.data[index].menu_orderQuantity - 1;
-            // let index = orderList.value.findIndex(x=>x.menu_id === id);
-            // let quantity = orderList.value[index].menu_orderQuantity - 1;
             decreaserHelper(quantity,index,id);
         }
         const addOrder = (id:string) => {
@@ -320,16 +346,16 @@ export default defineComponent({
                     return;
             }
         }
+        const checkout = () => {
+            router.push({path:"/checkout"});
+            window.scrollTo({top:0,behavior:'smooth'});
+        }
 
         // computed functions
         const filterDishes = computed(()=> 
             menuList.value.appData!.data.filter(x=>
                 x.menu_item.toLowerCase().includes(userFilter.value.toLowerCase())
             ))
-
-        const cartSubtotal = computed(()=>orderList.value.reduce((acc,val)=> {
-                return acc + (val.menu_price * val.menu_orderQuantity)
-            },0))
 
         // fetches
         const getRestaurant = async() => {
@@ -367,13 +393,15 @@ export default defineComponent({
             try {
                 let response = await fetch(`http://localhost:8000/api/v1/menu/restaurant/${restaurant_id.value}`);
                 let data = await response.json();
-
-                data.data = data.data.map((item:Menu)=>{
-                    return {
-                        ...item,
-                        menu_hasOrdered:false
-                    }
-                })
+                
+                let cartState = localStorage.getItem('cart');
+                if(cartState){
+                    orderList.value = JSON.parse(cartState);
+                    orderList.value.order_item.forEach(order=>{
+                        let index = data.data.findIndex((x:Menu)=>x.menu_id === order.order_menu_id);
+                        data.data[index].menu_orderQuantity = order.order_quantity;
+                    })
+                } 
 
                 fetchMenu = {
                     ...fetchMenu,
@@ -396,20 +424,30 @@ export default defineComponent({
         // helper functions
         const decreaserHelper = (quantity:number,index:number,id:string) => {
             if(!quantity){
-                orderList.value = orderList.value.filter(x=>x.menu_id !== id);
                 menuList.value.appData!.data[index].menu_orderQuantity = 0;
+                orderList.value.order_item = orderList.value.order_item.filter(x=>x.order_menu_id !== id);
             } else {
-                menuList.value.appData!.data[index].menu_orderQuantity = quantity;
-    
-                let indexOrder = orderList.value.findIndex(x=>x.menu_id === id);
-                orderList.value[indexOrder].menu_orderQuantity = quantity;
+                menuList.value.appData!.data[index].menu_orderQuantity = quantity;    
+                let indexOrder = orderList.value.order_item.findIndex(x=>x.order_menu_id === id);
+                orderList.value.order_item[indexOrder].order_quantity = quantity;
+            }
+            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
+            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
+            
+            if(!orderList.value.order_item.length){
+                localStorage.removeItem('cart');
+                orderList.value = {} as Order;
+            } else {
+                localStorage.setItem('cart',JSON.stringify(orderList.value));
             }
         }
         const addHelper = (quantity:number,index:number,id:string) =>{
             menuList.value.appData!.data[index].menu_orderQuantity = quantity;
-            let indexOrder = orderList.value.findIndex(x=>x.menu_id === id);
-            orderList.value[indexOrder].menu_orderQuantity = quantity;
-
+            let indexOrder = orderList.value.order_item.findIndex(x=>x.order_menu_id === id);
+            orderList.value.order_item[indexOrder].order_quantity = quantity;
+            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
+            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
+            localStorage.setItem('cart',JSON.stringify(orderList.value));
         }
 
         // lifecycle hooks
@@ -471,7 +509,6 @@ export default defineComponent({
             userOrderChoice,
             filterDishes,
             orderList,
-            cartSubtotal,
             clearSearch,
             decreaseOrder,
             addOrder,
@@ -483,7 +520,8 @@ export default defineComponent({
             sideProps,
             dessertsProps,
             beveragesProps,
-            searchProps
+            searchProps,
+            checkout
         }
     }
 })

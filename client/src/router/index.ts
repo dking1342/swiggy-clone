@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Restaurants from '../components/Restaurants.vue'
 import Restaurant from '../components/Restaurant.vue'
 import Home from '../components/Home.vue';
+import Checkout from '../components/Checkout.vue';
 
 const routes:Route[] = [
     {
@@ -19,6 +20,11 @@ const routes:Route[] = [
         path:"/restaurants/:id",
         name:"Restaurant",
         component:Restaurant
+    },
+    {
+        path:"/checkout",
+        name:"Checkout",
+        component:Checkout
     }
 ]
 

@@ -11,7 +11,7 @@
         <router-link to="/"><span data-before-content="Offers" class="link-icon">%</span> <span class="link-text">Offers</span></router-link>
         <router-link to="/"><span data-before-content="Help" class="link-icon">🙋🏻‍♂️</span> <span class="link-text">Help</span></router-link>
         <router-link to="/"><span data-before-content="Sign In" class="link-icon">✏️</span> <span class="link-text">Sign In</span></router-link>
-        <router-link to="/"><span data-before-content="Cart" class="link-icon">🧺</span> <span class="link-text">Cart</span></router-link>
+        <router-link to="/checkout"><span data-before-content="Cart" class="link-icon">🧺</span> <span class="link-text">Cart</span></router-link>
     </div>
   </nav>
 </template>

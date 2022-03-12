@@ -65,6 +65,27 @@ export interface Menu {
     menu_orderQuantity:number
 }
 
+export interface OrderItem {
+    order_menu_id:string,
+    order_menu_name:string,
+    order_quantity:number,
+    order_cost:number
+    restaurant:Restaurant<Discount>
+}
+
+export interface Order {
+    order_id:string,
+    order_item:OrderItem[],
+    cart_quantity:number,
+    cart_cost:number
+}
+
+export interface OrderReceipt {
+    number:string,
+    customer:string,
+    expiry:string,
+    cvv:string,
+}
 
 
 export const placeholderFetch:ResponseAppState<FetchResponse<Restaurant<Discount>>> = {
@@ -200,5 +221,42 @@ export const placeholderMenuFetch:ResponseAppState<FetchResponse<Menu>> = {
         data:placeholderMenu
     },
     error:""
+}
+
+export const placeholderOrder:Order = {
+    order_id:"",
+    order_item:[
+        {
+            order_menu_id:"",
+            order_menu_name:"",
+            order_quantity:0,
+            order_cost:0,
+            restaurant:{
+                restaurant_id:"",
+                restaurant_name:"",
+                restaurant_address_1:"",
+                restaurant_address_2:"",
+                restaurant_city:"",
+                restaurant_zip_code:"",
+                restaurant_state:"",
+                restaurant_cuisines:[""],
+                restaurant_main_img:"",
+                discount_isValid:false,
+                discounts:{
+                    discount_id:"",
+                    discount_code:"",
+                    discount_text:"",
+                    discount_amount:0,
+                    discount_created:new Date()
+                },
+                restaurant_cost:0,
+                restaurant_rating:0.0,
+                restaurant_created:new Date()                
+            }
+        }
+    ],
+    cart_quantity:0,
+    cart_cost:0
+
 }
 

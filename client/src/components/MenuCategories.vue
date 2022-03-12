@@ -16,11 +16,11 @@
                     <img :src="dishes.menu_image" :alt="dishes.menu_item">
                 </div>
                 <div class="menu-card-btn-wrapper">
-                    <button v-if="!orderList.value.filter(x=>x.menu_id === dishes.menu_id).length" class="init-btn" @click="userOrderChoice(dishes)">Add</button>
-                    <div v-else-if="orderList.value.filter(x=>x.menu_id === dishes.menu_id).length" class="menu-card-btn-tray">
-                        <button class="decrease-btn" @click="decreaseOrder(dishes.menu_id)">-</button>
+                    <button v-if="!orderList?.value.order_item?.filter(x=>x.order_menu_id === dishes.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',dishes)">Add</button>
+                    <div v-else-if="orderList?.value.order_item?.filter(x=>x.order_menu_id === dishes.menu_id).length" class="menu-card-btn-tray">
+                        <button class="decrease-btn" @click="$emit('decreaseOrder',dishes.menu_id)">-</button>
                         <span>{{ dishes.menu_orderQuantity }}</span>
-                        <button class="add-btn" @click="addOrder(dishes.menu_id)">+</button>
+                        <button class="add-btn" @click="$emit('addOrder',dishes.menu_id)">+</button>
                     </div>
                 </div>
             </div>
@@ -43,8 +43,8 @@
                     <img :src="menu.menu_image" :alt="menu.menu_item">
                 </div>
                 <div class="menu-card-btn-wrapper">
-                    <button v-if="!orderList.value.filter(x=>x.menu_id === menu.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',menu)">Add</button>
-                    <div v-else-if="orderList.value.filter(x=>x.menu_id === menu.menu_id).length" class="menu-card-btn-tray">
+                    <button v-if="!orderList?.value.order_item?.filter(x=>x.order_menu_id === menu.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',menu)">Add</button>
+                    <div v-else-if="orderList?.value.order_item?.filter(x=>x.order_menu_id === menu.menu_id).length" class="menu-card-btn-tray">
                         <button class="decrease-btn" @click="$emit('decreaseOrder',menu.menu_id)">-</button>
                         <span>{{ menu.menu_orderQuantity }}</span>
                         <button class="add-btn" @click="$emit('addOrder',menu.menu_id)">+</button>
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent,  } from 'vue'
 
 export default defineComponent({
     props:{
@@ -72,12 +72,18 @@ export default defineComponent({
     emits:[
         'decreaseOrder',
         'addOrder',
-        'userOrderChoice'
+        'userOrderChoice',
     ],
     setup () {
 
+ 
 
-        return {}
+
+
+
+        return {
+            
+        }
     }
 })
 </script>
