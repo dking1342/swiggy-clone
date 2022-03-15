@@ -122,24 +122,24 @@
                     </div>
                 </article>
                 <aside class="cart-container">
-                    <div class="cart-empty-container" v-if="Boolean(!Object.keys(orderList).length)">
+                    <div class="cart-empty-container" v-if="!orderList.order_item">
                         <h1>Cart Empty</h1>
                         <div class="cart-empty-img">
                             <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_480/Cart_empty_-_menu_2x_ejjkf2" alt="empty cart">
                         </div>
                         <p>Good food is always cooking! Go ahead, order some yummy items from the menu.</p>
                     </div>
-                    <div class="cart-full-container" v-if="Boolean(Object.keys(orderList).length)">
+                    <div class="cart-full-container" v-else-if="orderList.order_item">
                         <h1>Cart</h1>
                         <div class="cart-receipt-list">
                             <div class="cart-receipt-list-item" v-for="order in orderList.order_item" :key="order.order_menu_id">
-                                <span class="cart-item-name">{{ order.order_menu_name }}</span>
+                                <span class="cart-item-name">{{ order.order_item_name.menu_item }}</span>
                                 <div class="cart-receipt-toggle-btns">
-                                    <button class="cart-btn-decrease" @click="decreaseCart(order.order_menu_id)">-</button>
-                                    <span>{{ order.order_quantity }}</span>
-                                    <button class="cart-btn-add" @click="addCart(order.order_menu_id)">+</button>
+                                    <button class="cart-btn-decrease" @click="decreaseCart(order.order_item_name.menu_id)">-</button>
+                                    <span>{{ order.order_item_quantity }}</span>
+                                    <button class="cart-btn-add" @click="addCart(order.order_item_name.menu_id)">+</button>
                                 </div>
-                                <span class="cart-item-cost">${{ order.order_cost * order.order_quantity }}</span>
+                                <span class="cart-item-cost">${{ order.order_item_quantity * order.order_item_name.menu_price }}</span>
                             </div>
                         </div>
                         <div class="cart-receipt-total">
@@ -200,7 +200,7 @@
 </template>
 
 <script lang="ts">
-import { DATASTATE, Discount, FetchResponse, Menu, Order, placeholderFetch, placeholderMenuFetch, placeholderOrder, ResponseAppState, Restaurant } from '@/types/fetch-types';
+import { DATASTATE, Discount, FetchResponse, Menu, Order, OrderItem, ResponseAppState, Restaurant } from '@/types/fetch-types';
 import { computed, defineComponent, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import MenuCategories from '../components/MenuCategories.vue'
@@ -211,10 +211,10 @@ export default defineComponent({
     },
     setup () {
         let isToggled = ref(false);
-        let fetchRestaurant:ResponseAppState<FetchResponse<Restaurant<Discount>>> = placeholderFetch;
-        let restaurantList = ref(placeholderFetch);
-        let fetchMenu:ResponseAppState<FetchResponse<Menu>> = placeholderMenuFetch;
-        let menuList = ref(placeholderMenuFetch);
+        let fetchRestaurant= {} as ResponseAppState<FetchResponse<Restaurant<Discount>>>;
+        let restaurantList = ref({} as ResponseAppState<FetchResponse<Restaurant<Discount>>>);
+        let fetchMenu = {} as ResponseAppState<FetchResponse<Menu>>;
+        let menuList = ref({} as ResponseAppState<FetchResponse<Menu>>);
         let route = useRoute();
         let router = useRouter();
         let restaurant_id = ref(route.params.id);
@@ -244,32 +244,41 @@ export default defineComponent({
             })
         }
         const userOrderChoice = (item:Menu) => {
-            let order = {
-                order_menu_id:item.menu_id,
-                order_menu_name:item.menu_item,
-                order_quantity:1,
-                order_cost:item.menu_price,
-                restaurant:item.restaurant
+            let order:OrderItem = {
+                    order_item_id:"",
+                order_item_name:item,
+                order_item_quantity:1,
+                order_reference:"",
+                order_restaurant:item.restaurant.restaurant_id
             }
+
+            // check local state to set with new or existing values
             let localState = localStorage.getItem('cart');
-            if(localState){
+            if(!localState){ // no state yet
+                orderList.value = {
+                    order_id:"",
+                    order_item:[order],
+                    cart_quantity:order.order_item_quantity,
+                    cart_cost:order.order_item_quantity * order.order_item_name.menu_price
+                };
+                localStorage.setItem('cart',JSON.stringify(orderList.value));
+            } else { // state is present
                 let currentState:Order = JSON.parse(localState);
-                currentState.order_item = [...currentState.order_item,order];
-                currentState.cart_quantity = currentState.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
-                currentState.cart_cost = currentState.order_item.reduce((acc,val)=> acc + (val.order_quantity * val.order_cost),0);
-                orderList.value = currentState;
-                localStorage.setItem('cart',JSON.stringify(currentState));                
-            } else {
-                let cart = placeholderOrder;
-                cart.order_item = [...cart.order_item,order];
-                cart.order_item = cart.order_item.filter(x=>x.order_menu_id);
-                cart.cart_quantity = cart.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
-                cart.cart_cost = cart.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
-                orderList.value = cart;
-                localStorage.setItem('cart',JSON.stringify(cart));
+                let order_items = [...currentState.order_item,order];
+
+                orderList.value = {
+                    ...currentState,
+                    order_item:order_items,
+                    cart_quantity:order_items.reduce((acc,val)=> acc + val.order_item_quantity,0),
+                    cart_cost:order_items.reduce((acc,val)=> acc + (val.order_item_quantity * val.order_item_name.menu_price),0)
+                }
+                localStorage.setItem('cart',JSON.stringify(orderList.value));                
             }
+
+            // set the menu list to reflect current order values
             let index:number = menuList.value.appData!.data.findIndex((x)=>x.menu_id === item.menu_id);
             menuList.value.appData!.data[index].menu_orderQuantity = 1;
+            
         }
         const clearSearch = () => {
             let search = document.querySelector("#search") as HTMLInputElement;
@@ -398,8 +407,8 @@ export default defineComponent({
                 if(cartState){
                     orderList.value = JSON.parse(cartState);
                     orderList.value.order_item.forEach(order=>{
-                        let index = data.data.findIndex((x:Menu)=>x.menu_id === order.order_menu_id);
-                        data.data[index].menu_orderQuantity = order.order_quantity;
+                        let index = data.data.findIndex((x:Menu)=>x.menu_id === order.order_item_name.menu_id);
+                        data.data[index].menu_orderQuantity = order.order_item_quantity;
                     })
                 } 
 
@@ -423,17 +432,22 @@ export default defineComponent({
 
         // helper functions
         const decreaserHelper = (quantity:number,index:number,id:string) => {
+            // check if quantity is zero or 1+
             if(!quantity){
+                // sets menu quantity value to zero and removes order from state
                 menuList.value.appData!.data[index].menu_orderQuantity = 0;
-                orderList.value.order_item = orderList.value.order_item.filter(x=>x.order_menu_id !== id);
+                orderList.value.order_item = orderList.value.order_item.filter(x=>x.order_item_name.menu_id !== id);
             } else {
+                // sets menu quantity with new quantity along with the order state
                 menuList.value.appData!.data[index].menu_orderQuantity = quantity;    
-                let indexOrder = orderList.value.order_item.findIndex(x=>x.order_menu_id === id);
-                orderList.value.order_item[indexOrder].order_quantity = quantity;
+                let indexOrder = orderList.value.order_item.findIndex(x=>x.order_item_name.menu_id === id);
+                orderList.value.order_item[indexOrder].order_item_quantity = quantity;
             }
-            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
-            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
-            
+            // sets cart quantity and cost values
+            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_item_quantity,0);
+            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_item_quantity * val.order_item_name.menu_price),0);
+
+            // removes or sets localstorage depending on quantity and length of order state
             if(!orderList.value.order_item.length){
                 localStorage.removeItem('cart');
                 orderList.value = {} as Order;
@@ -442,11 +456,14 @@ export default defineComponent({
             }
         }
         const addHelper = (quantity:number,index:number,id:string) =>{
+            // sets menu quantity
             menuList.value.appData!.data[index].menu_orderQuantity = quantity;
-            let indexOrder = orderList.value.order_item.findIndex(x=>x.order_menu_id === id);
-            orderList.value.order_item[indexOrder].order_quantity = quantity;
-            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
-            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
+
+            // sets order state for new quantity
+            let indexOrder = orderList.value.order_item.findIndex(x=>x.order_item_name.menu_id === id);
+            orderList.value.order_item[indexOrder].order_item_quantity = quantity;
+            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_item_quantity,0);
+            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_item_quantity * val.order_item_name.menu_price),0);
             localStorage.setItem('cart',JSON.stringify(orderList.value));
         }
 

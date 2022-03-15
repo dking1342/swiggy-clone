@@ -66,11 +66,21 @@ export interface Menu {
 }
 
 export interface OrderItem {
-    order_menu_id:string,
-    order_menu_name:string,
-    order_quantity:number,
-    order_cost:number
-    restaurant:Restaurant<Discount>
+    order_item_id:string,
+    order_item_name:Menu,
+    order_item_quantity:number,
+    order_reference:string,
+    order_restaurant:string | null
+}
+
+export interface OrderConfirmationItem {
+    order_item_id:string,
+    order_item_name:string,
+    order_item_price:number,
+    order_item_quantity:number,
+    order_item_cost:number,
+    order_reference:string,
+    order_restaurant:string,
 }
 
 export interface Order {
@@ -87,176 +97,10 @@ export interface OrderReceipt {
     cvv:string,
 }
 
-
-export const placeholderFetch:ResponseAppState<FetchResponse<Restaurant<Discount>>> = {
-    dataState:DATASTATE.loading,
-    appData:{
-        timestamp:new Date(),
-        status:"",
-        status_code:"",
-        message:"",
-        data:[{
-            restaurant_id:"",
-            restaurant_name:"",
-            restaurant_address_1:"",
-            restaurant_address_2:"",
-            restaurant_city:"",
-            restaurant_zip_code:"",
-            restaurant_state:"",
-            restaurant_cuisines:[""],
-            restaurant_main_img:"",
-            discount_isValid:false,
-            discounts:{
-                discount_id:"",
-                discount_code:"",
-                discount_text:"",
-                discount_amount:0,
-                discount_created:new Date()
-            },
-            restaurant_cost:0,
-            restaurant_rating:0.0,
-            restaurant_created:new Date()
-        }]
-    },
-    error:""
-}
-
-export const placeholderCuisineFetch:ResponseAppState<FetchResponse<Cuisine>> = {
-    dataState:DATASTATE.loading,
-    appData:{
-        timestamp:new Date(),
-        status:"",
-        status_code:"",
-        message:"",
-        data:[{
-            cuisine_id:"",
-            cuisine_name:""
-        }]
-    },
-    error:""
-}
-
-export const placeholderMenu:Menu[] = [
-    {
-        menu_id:"",
-        menu_category:"",
-        menu_item:"",
-        menu_description:"",
-        menu_price:0,
-        menu_image:"",
-        menu_hasOffer:false,
-        menu_offer:{
-            discount_id:"",
-            discount_amount:0,
-            discount_code:"",
-            discount_text:"",
-            discount_created:new Date()
-        },
-        menu_isBestseller:false,
-        restaurant:{
-            restaurant_id:"",
-            restaurant_name:"",
-            restaurant_address_1:"",
-            restaurant_address_2:"",
-            restaurant_city:"",
-            restaurant_zip_code:"",
-            restaurant_state:"",
-            restaurant_cuisines:[""],
-            restaurant_main_img:"",
-            discount_isValid:false,
-            discounts:{
-                discount_id:"",
-                discount_code:"",
-                discount_text:"",
-                discount_amount:0,
-                discount_created:new Date()
-            },
-            restaurant_cost:0,
-            restaurant_rating:0.0,
-            restaurant_created:new Date()            
-        },
-        menu_created:new Date(),
-        menu_orderQuantity:0
-    }
-]
-
-export const placeholderFetchMenu:FetchResponse<Menu> = {
-    timestamp:new Date(),
-    status:"",
-    status_code:"",
-    message:"",
-    data:placeholderMenu
-}
-
-export const placeholderRestaurant:Restaurant<Discount>[] = [{
-    restaurant_id:"",
-    restaurant_name:"",
-    restaurant_address_1:"",
-    restaurant_address_2:"",
-    restaurant_city:"",
-    restaurant_zip_code:"",
-    restaurant_state:"",
-    restaurant_cuisines:[""],
-    restaurant_main_img:"",
-    discount_isValid:false,
-    discounts:{
-        discount_id:"",
-        discount_code:"",
-        discount_text:"",
-        discount_amount:0,
-        discount_created:new Date()
-    },
-    restaurant_cost:0,
-    restaurant_rating:0.0,
-    restaurant_created:new Date()
-}]
-
-export const placeholderMenuFetch:ResponseAppState<FetchResponse<Menu>> = {
-    dataState:DATASTATE.loading,
-    appData:{
-        timestamp:new Date(),
-        status:"",
-        status_code:"",
-        message:"",
-        data:placeholderMenu
-    },
-    error:""
-}
-
-export const placeholderOrder:Order = {
-    order_id:"",
-    order_item:[
-        {
-            order_menu_id:"",
-            order_menu_name:"",
-            order_quantity:0,
-            order_cost:0,
-            restaurant:{
-                restaurant_id:"",
-                restaurant_name:"",
-                restaurant_address_1:"",
-                restaurant_address_2:"",
-                restaurant_city:"",
-                restaurant_zip_code:"",
-                restaurant_state:"",
-                restaurant_cuisines:[""],
-                restaurant_main_img:"",
-                discount_isValid:false,
-                discounts:{
-                    discount_id:"",
-                    discount_code:"",
-                    discount_text:"",
-                    discount_amount:0,
-                    discount_created:new Date()
-                },
-                restaurant_cost:0,
-                restaurant_rating:0.0,
-                restaurant_created:new Date()                
-            }
-        }
-    ],
-    cart_quantity:0,
-    cart_cost:0
-
+export interface Rating {
+    rating_id:string,
+    rating_rate:number,
+    rating_order_reference:string,
+    rating_restaurant:string
 }
 

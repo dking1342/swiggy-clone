@@ -4,6 +4,7 @@ import Restaurants from '../components/Restaurants.vue'
 import Restaurant from '../components/Restaurant.vue'
 import Home from '../components/Home.vue';
 import Checkout from '../components/Checkout.vue';
+import Confirmation from '../components/Confirmation.vue';
 
 const routes:Route[] = [
     {
@@ -25,6 +26,11 @@ const routes:Route[] = [
         path:"/checkout",
         name:"Checkout",
         component:Checkout
+    },
+    {
+        path:"/confirmation/:id",
+        name:"Confirmation",
+        component:Confirmation
     }
 ]
 

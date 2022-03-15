@@ -98,5 +98,3 @@ def getRestaurant(request, pk):
     except:
         print("something went wrong")
         raise Http404
-
-

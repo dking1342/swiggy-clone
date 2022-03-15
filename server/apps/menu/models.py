@@ -7,7 +7,7 @@ from apps.restaurants.models import Restaurant
 
 # Create your models here.
 class Menu(models.Model):
-    menu_id = models.UUIDField(null=False, blank=False, primary_key=True, default=uuid.uuid4, unique=True)
+    menu_id = models.UUIDField(null=False, blank=False, primary_key=True, default=uuid.uuid4)
     CATEGORY = (
         ('M', 'Main'),
         ('S', 'Side'),

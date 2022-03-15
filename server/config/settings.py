@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'apps.menu',
     'apps.userinfo',
     'apps.cuisines',
+    'apps.cart',
+    'apps.rating',
 ]
 
 REST_FRAMEWORK = {

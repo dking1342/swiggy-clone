@@ -43,8 +43,8 @@
                     <img :src="menu.menu_image" :alt="menu.menu_item">
                 </div>
                 <div class="menu-card-btn-wrapper">
-                    <button v-if="!orderList?.value.order_item?.filter(x=>x.order_menu_id === menu.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',menu)">Add</button>
-                    <div v-else-if="orderList?.value.order_item?.filter(x=>x.order_menu_id === menu.menu_id).length" class="menu-card-btn-tray">
+                    <button v-if="!orderList?.value.order_item?.filter(x=>x.order_item_name.menu_id === menu.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',menu)">Add</button>
+                    <div v-else-if="orderList?.value.order_item?.filter(x=>x.order_item_name.menu_id === menu.menu_id).length" class="menu-card-btn-tray">
                         <button class="decrease-btn" @click="$emit('decreaseOrder',menu.menu_id)">-</button>
                         <span>{{ menu.menu_orderQuantity }}</span>
                         <button class="add-btn" @click="$emit('addOrder',menu.menu_id)">+</button>

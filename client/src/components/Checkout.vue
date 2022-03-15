@@ -54,14 +54,14 @@
                 </router-link>
             </div>
             <div class="order-item-container">
-                <div class="order-item" v-for="item in cart.order_item" :key="item.order_menu_id">
-                    <span>{{ item.order_menu_name }}</span>
+                <div class="order-item" v-for="item in cart.order_item" :key="item.order_id">
+                    <span>{{ item.order_item_name.menu_item }}</span>
                     <div class="order-btn-container">
-                        <button class="decrease-order" @click="decreaseOrder(item.order_menu_id)">-</button>
-                        <span class="order-quantity">{{ item.order_quantity }}</span>
-                        <button class="add-order" @click="addOrder(item.order_menu_id)">+</button>
+                        <button class="decrease-order" @click="decreaseOrder(item.order_item_name.menu_id)">-</button>
+                        <span class="order-quantity">{{ item.order_item_quantity }}</span>
+                        <button class="add-order" @click="addOrder(item.order_item_name.menu_id)">+</button>
                     </div>
-                    <p class="order-cost">${{ item.order_cost * item.order_quantity }}</p>
+                    <p class="order-cost">${{ item.order_item_quantity * item.order_item_name.menu_price }}</p>
                 </div>
             </div>
             <div class="order-totals-container">
@@ -157,7 +157,35 @@
             </div>
         </div>
         <div class="payment-confirmation" v-else-if="isPaymentProcessing">
-            Processing payment
+            <h1>Payment is being processed</h1>
+            <p>Please do not refresh or go to previous screen</p>
+            <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                viewBox="0 0 100 50" enable-background="new 0 0 0 0" xml:space="preserve">
+                <circle fill="#fc8019" stroke="none" cx="0" cy="25" r="15">
+                    <animate
+                    attributeName="opacity"
+                    dur="1s"
+                    values="0;1;0"
+                    repeatCount="indefinite"
+                    begin="0.1"/>    
+                </circle>
+                <circle fill="#fc8019" stroke="none" cx="50" cy="25" r="15">
+                    <animate
+                    attributeName="opacity"
+                    dur="1s"
+                    values="0;1;0"
+                    repeatCount="indefinite" 
+                    begin="0.2"/>       
+                </circle>
+                <circle fill="#fc8019" stroke="none" cx="100" cy="25" r="15">
+                    <animate
+                    attributeName="opacity"
+                    dur="1s"
+                    values="0;1;0"
+                    repeatCount="indefinite" 
+                    begin="0.3"/>     
+                </circle>
+                </svg>
         </div>
     </section>
 
@@ -166,6 +194,7 @@
 <script lang="ts">
 import { Discount, Order, OrderReceipt, Restaurant } from '@/types/fetch-types';
 import { computed, defineComponent, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     setup () {
@@ -175,6 +204,7 @@ export default defineComponent({
         let orderReceipt = ref({} as OrderReceipt);
         let isPaymentProcessing = ref(false);
         let isPaymentModal = ref(false);
+        let router = useRouter();
 
 
 
@@ -184,28 +214,28 @@ export default defineComponent({
             if(localState){
                 isCartFilled.value = true;
                 cart.value = JSON.parse(localState);
-                let id = JSON.parse(localState).order_item[0].restaurant;
+                let id = cart.value.order_item[0].order_item_name.restaurant;
                 getRestaurant(id)
             }
         }
         const addOrder = (id:string) => {
-            let index = cart.value.order_item.findIndex(x=>x.order_menu_id === id);
-            let quantity = cart.value.order_item[index].order_quantity + 1;
-            cart.value.order_item[index].order_quantity = quantity;
-            cart.value.cart_quantity = cart.value.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
-            cart.value.cart_cost = cart.value.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
+            let index = cart.value.order_item.findIndex(x=>x.order_item_name.menu_id === id);
+            let quantity = cart.value.order_item[index].order_item_quantity + 1;
+            cart.value.order_item[index].order_item_quantity = quantity;
+            cart.value.cart_quantity = cart.value.order_item.reduce((acc,val)=>acc + val.order_item_quantity,0);
+            cart.value.cart_cost = cart.value.order_item.reduce((acc,val)=>acc + (val.order_item_quantity * val.order_item_name.menu_price),0);
             localStorage.setItem('cart',JSON.stringify(cart.value));            
         }
         const decreaseOrder = (id:string) => {
-            let index = cart.value.order_item.findIndex(x=>x.order_menu_id === id);
-            let quantity = cart.value.order_item[index].order_quantity - 1;
+            let index = cart.value.order_item.findIndex(x=>x.order_item_name.menu_id === id);
+            let quantity = cart.value.order_item[index].order_item_quantity - 1;
             if(!quantity){
-                cart.value.order_item = cart.value.order_item.filter(x=>x.order_menu_id !== id);
+                cart.value.order_item = cart.value.order_item.filter(x=>x.order_item_name.menu_id !== id);
             } else {
-                cart.value.order_item[index].order_quantity = quantity;
+                cart.value.order_item[index].order_item_quantity = quantity;
             }
-            cart.value.cart_quantity = cart.value.order_item.reduce((acc,val)=>acc + val.order_quantity,0);
-            cart.value.cart_cost = cart.value.order_item.reduce((acc,val)=>acc + (val.order_quantity * val.order_cost),0);
+            cart.value.cart_quantity = cart.value.order_item.reduce((acc,val)=>acc + val.order_item_quantity,0);
+            cart.value.cart_cost = cart.value.order_item.reduce((acc,val)=>acc + (val.order_item_quantity * val.order_item_name.menu_price),0);
 
             if(!cart.value.order_item.length){
                 localStorage.removeItem('cart');
@@ -225,9 +255,7 @@ export default defineComponent({
         }
         const makePayment = () => {
             if(Object.values(orderReceipt.value).length === 4){
-                console.log("valid")
-                // wait for a bit to show payment processing
-                // route to confirmation view
+                createOrder(cart.value);
             } else {
                 alert("Please provide and input for all fields")
             }
@@ -248,6 +276,38 @@ export default defineComponent({
                 restaurant.value = data.data[0];
             } catch (error) {
                 console.log(error);
+            }
+        }
+        const createOrder = async(order:any) => {
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/cart/create/',{
+                    method: 'POST', 
+                    mode: 'cors', 
+                    cache: 'no-cache', 
+                    credentials: 'same-origin', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    redirect: 'follow',
+                    referrerPolicy: 'no-referrer',
+                    body: JSON.stringify(order) 
+                });
+                const data = await response.json();
+                
+                if(+data.status_code === 200){
+                    isPaymentProcessing.value = true;
+
+                    // remove cart from local storage
+                    localStorage.removeItem('cart');
+
+                    // success to confirmation view
+                    setTimeout(()=>{
+                        router.push({name:"Restaurants"})
+                        router.push({name:"Confirmation",params:{id:data.data[0].order_reference}})
+                    },3000);
+                }
+            } catch (error) {
+                console.log(error)
             }
         }
 
@@ -764,6 +824,33 @@ export default defineComponent({
         outline:none;
         border:none;
         border-radius: 5px;
+    }
+
+    /* payment confirmation */
+    .payment-confirmation{
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 35px 35px auto;
+        height: fit-content;
+        width: 350px;
+        background-color: #fff;
+        padding:25px;
+        border-radius: 5px;
+        gap:15px;
+    }
+    .payment-confirmation h1{
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+    }
+    .payment-confirmation p{
+        font-size: 13px;
+        color:#535665;
+        text-align: center;
+    }
+    .payment-confirmation svg{
+        width: 100%;
+        height: 100px;
     }
 
 

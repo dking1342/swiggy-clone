@@ -72,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { DATASTATE, FetchResponse, ResponseAppState, Restaurant,placeholderFetch, Discount, Cuisine, placeholderCuisineFetch } from '../types/fetch-types';
+import { DATASTATE, FetchResponse, ResponseAppState, Restaurant, Discount, Cuisine } from '../types/fetch-types';
 import { defineComponent, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -80,10 +80,10 @@ import { useRouter } from 'vue-router';
 export default defineComponent({
     setup () {
         let isModalShowing = true;
-        let fetchResult:ResponseAppState<FetchResponse<Restaurant<Discount>>> = placeholderFetch;
-        let htmlOutput = ref(placeholderFetch);
-        let cuisineFetchResult:ResponseAppState<FetchResponse<Cuisine>> = placeholderCuisineFetch;
-        let cuisineList = ref(placeholderCuisineFetch);
+        let fetchResult= {} as ResponseAppState<FetchResponse<Restaurant<Discount>>>;
+        let htmlOutput = ref({} as ResponseAppState<FetchResponse<Restaurant<Discount>>>);
+        let cuisineFetchResult= {} as ResponseAppState<FetchResponse<Cuisine>>;
+        let cuisineList = ref({} as ResponseAppState<FetchResponse<Cuisine>>);
         let restaurantCount = ref(0);
         let router = useRouter();
 
@@ -206,6 +206,7 @@ export default defineComponent({
 
         }
 
+        // fetch
         const getRestaurants = async() => {
             fetchResult = {
                 ...fetchResult,
