@@ -1,11 +1,10 @@
 <template>
     <header>
         <div class="left-header">
-            <h1 v-if="restaurantCount > 1">{{ restaurantCount }} restaurants</h1>
-            <h1 v-else-if="restaurantCount = 1">{{ restaurantCount }} restaurant</h1>
+            <h1 v-if="restaurantCount">{{ restaurantCount }} restaurants</h1>
             <h1 v-else>No restaurants</h1>
         </div>
-        <div class="right-header">
+        <div class="right-header" v-if="restaurantCount">
             <select name="links" class="link-dropdown" @change="sortRestaurantsDropdown">
                 <option value="null" selected disabled>Sort Restaurants</option>
                 <option value="Discounts">Discounts</option>
@@ -21,9 +20,9 @@
         </div>
     </header>
     <section v-if="htmlOutput.dataState === 'LOADING'">
-        loading...
+        <Loading />
     </section>
-    <section v-else-if="htmlOutput.dataState === 'SUCCESS'">
+    <section v-else-if="htmlOutput.dataState === 'SUCCESS' && restaurantCount">
         <div v-for="restaurant in htmlOutput.appData.data" :key="restaurant.restaurant_id" class="card">
             <button @click="navigateUser(restaurant.restaurant_id)" class="card-button-link">
                 <div class="card-img">
@@ -44,9 +43,11 @@
             </button>
         </div>
     </section>
+    <section v-else-if="htmlOutput.dataState === 'SUCCESS' && !restaurantCount">
+        <Error message="No restaurants found in this location. Please check again soon to see if there are restaurants located near you" />
+    </section>
     <section v-else-if="htmlOutput.dataState === 'ERROR'">
-        <!-- todo make a 404 page -->
-        {{ htmlOutput.error }}
+        <Error message="Page was not found" />
     </section>
     <div class="filter-overlay" v-if="cuisineList.dataState === 'SUCCESS' && cuisineList.appData.data.length">
         <aside class="filter-modal">
@@ -72,21 +73,29 @@
 </template>
 
 <script lang="ts">
-import { DATASTATE, FetchResponse, ResponseAppState, Restaurant, Discount, Cuisine } from '../types/fetch-types';
-import { defineComponent, onMounted, ref } from 'vue';
+import { FetchResponse, ResponseAppState, Restaurant, Discount, Cuisine } from '../types/fetch-types';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-
+import { useFetch } from '../utils/useFetch';
+import { useStore } from 'vuex';
+import Error from '../components/Error.vue';
+import Loading from '../components/Loading.vue';
 
 export default defineComponent({
+    components:{
+        Error,
+        Loading,
+    },
     setup () {
         let isModalShowing = true;
-        let fetchResult= {} as ResponseAppState<FetchResponse<Restaurant<Discount>>>;
+        let fetchResult= ref({} as ResponseAppState<FetchResponse<Restaurant<Discount>>>);
         let htmlOutput = ref({} as ResponseAppState<FetchResponse<Restaurant<Discount>>>);
-        let cuisineFetchResult= {} as ResponseAppState<FetchResponse<Cuisine>>;
         let cuisineList = ref({} as ResponseAppState<FetchResponse<Cuisine>>);
         let restaurantCount = ref(0);
-        let router = useRouter();
+        const router = useRouter();
+        const store = useStore();
 
+        // component functions/methods
         const sortRestaurants = (e:any) => {
             let elementText = e.target.parentElement.textContent;
             let elementTextContent = e.target.parentElement.textContent.toLowerCase();
@@ -101,14 +110,12 @@ export default defineComponent({
             })
 
         }
-
         const sortRestaurantsDropdown = (e:any) => {
             let elementText = e.target.value;
             let elementTextContent = e.target.value.toLowerCase();
             sortHelper(elementText,elementTextContent);
             window.scrollTo({top:0,behavior:'smooth'})
         }
-
         const toggleFilterModal = () => {
             let filterElement = document.querySelector('.filter-overlay') as HTMLDivElement;
             let filterModal = document.querySelector('.filter-modal') as HTMLDivElement;
@@ -136,7 +143,6 @@ export default defineComponent({
                 filterModal.style.transition="all 1.25s ease-in";
             }
         }
-
         const navigateUser = (id:string) => {
             router.push({
                 name:"Restaurant",
@@ -145,7 +151,6 @@ export default defineComponent({
                 }
             })
         }
-
         const clearFilter = () => {
             // unchecks all inputs
             document.querySelectorAll('.form-field').forEach((item)=>{
@@ -156,10 +161,9 @@ export default defineComponent({
             });
 
             // resets the restaurant list
-            htmlOutput.value = fetchResult;
+            htmlOutput.value = fetchResult.value;
             restaurantCount.value = htmlOutput.value.appData?.data.length!;
         }
-
         const filterCuisines = () => {
             // loops through all cuisine choices and filters checked inputs
             let inputArray:string[] = [...document.querySelectorAll('.form-field')].reduce((acc:string[],val)=>{
@@ -172,12 +176,12 @@ export default defineComponent({
             },[]);
 
             // filtering out restaurant to include checked items
-            let filteredArray = fetchResult.appData?.data.reduce((acc:Restaurant<Discount>[],val)=>{
+            let filteredArray = fetchResult.value.appData?.data.reduce((acc:Restaurant<Discount>[],val)=>{
                 inputArray.forEach(input=>{
                     if(val.restaurant_cuisines.includes(input)){
                         // check to see if filterArray already has the restaurant
                         if(!acc.find(fil=>fil === val)){
-                            acc = [...acc,val];
+                            acc = [...acc,val as Restaurant<Discount>];
                         } 
                     } 
                 });
@@ -186,7 +190,7 @@ export default defineComponent({
 
             // new object to populate the restaurant list
             if(filteredArray!.length){
-                let newSearchResult = fetchResult;
+                let newSearchResult = fetchResult.value;
                 newSearchResult = {
                     ...newSearchResult,
                     appData:{
@@ -206,63 +210,32 @@ export default defineComponent({
 
         }
 
+        // computed
+        const userLocation = computed(() => store.state.location.state.location);
+
+        // watch
+        watch(userLocation,()=>{
+            if(userLocation.value){
+                getRestaurants();
+            }
+        })
+
         // fetch
         const getRestaurants = async() => {
-            fetchResult = {
-                ...fetchResult,
-                dataState:DATASTATE.loading
-            }
-            htmlOutput.value = fetchResult;
-            try {
-                const response = await fetch("http://localhost:8000/api/v1/restaurants");
-                const data:FetchResponse<Restaurant<Discount>> = await response.json();
-    
-                fetchResult = {
-                    ...fetchResult,
-                    dataState:DATASTATE.success,
-                    appData:data,
-                    error:""
-                }
-                htmlOutput.value = fetchResult;
-                restaurantCount.value = fetchResult.appData!.data.length;
-
-            } catch (error:any) {
-                fetchResult = {
-                    ...fetchResult,
-                    dataState:DATASTATE.error,
-                    error
-                }
-                htmlOutput.value = fetchResult;
-            }
+            let { dataState, data, errorMsg } = await useFetch<FetchResponse<Restaurant<Discount>>>("http://localhost:8000/api/v1/restaurants");
+            htmlOutput.value.appData = data.value as FetchResponse<Restaurant<Discount>>;
+            htmlOutput.value.dataState = dataState.value;
+            htmlOutput.value.error = errorMsg.value;
+            let filteredRestaurants = htmlOutput.value.appData!.data.filter(item=>item.restaurant_city.includes(userLocation.value));
+            restaurantCount.value = filteredRestaurants.length;
+            htmlOutput.value.appData!.data = filteredRestaurants;
+            fetchResult.value = htmlOutput.value;
         }
-
         const getCuisines = async() => {
-            cuisineFetchResult = {
-                ...cuisineFetchResult,
-                dataState:DATASTATE.loading
-            }
-            cuisineList.value = cuisineFetchResult;
-            try {
-                const response = await fetch("http://localhost:8000/api/v1/cuisines");
-                const data:FetchResponse<Cuisine> = await response.json();
-
-                cuisineFetchResult = {
-                    ...cuisineFetchResult,
-                    dataState:DATASTATE.success,
-                    appData:data,
-                    error:""
-                }
-                cuisineList.value = cuisineFetchResult;
-
-            } catch (error:any) {
-                cuisineFetchResult = {
-                    ...cuisineFetchResult,
-                    dataState:DATASTATE.error,
-                    error
-                }
-                cuisineList.value = cuisineFetchResult;
-                
-            }
+            let { dataState, data, errorMsg } = await useFetch<FetchResponse<Cuisine>>("http://localhost:8000/api/v1/cuisines");
+            cuisineList.value.dataState = dataState.value;
+            cuisineList.value.appData = data.value as FetchResponse<Cuisine>;
+            cuisineList.value.error = errorMsg.value;
         }
 
 
@@ -301,6 +274,11 @@ export default defineComponent({
         onMounted(()=>{
             getRestaurants();
             getCuisines();
+            store.dispatch('location/setLocationAction',"");
+            if(!userLocation.value){
+                router.push({name:"Home"});
+            }
+            store.dispatch('cart/setCartAction',[]);
         });
 
         return {

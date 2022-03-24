@@ -1,6 +1,6 @@
 <template>
     <section v-if="restaurantList.dataState == 'LOADING'">
-        loading restaurant...
+        <Loading />
     </section>
     <section v-else-if="restaurantList.dataState == 'SUCCESS'">
         <header >
@@ -57,7 +57,7 @@
             </div>
         </header>
         <section v-if="menuList.dataState == 'LOADING'">
-            loading menu...
+            <Loading />
         </section>
         <section v-else-if="menuList.dataState == 'SUCCESS'">
             <section class="menu-container">
@@ -75,69 +75,69 @@
                     <div v-if="userFilter">
                         <MenuCategories 
                             v-bind="searchProps"
-                            @decreaseOrder="decreaseOrder"
-                            @addOrder="addOrder"
+                            @decreaseFromCart="decreaseFromCart"
+                            @addToCart="addToCart"
                             @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category === 'BR').length">
                         <MenuCategories 
                             v-bind="breakfastProps"
-                            @decreaseOrder="decreaseOrder"
-                            @addOrder="addOrder"
+                            @decreaseFromCart="decreaseFromCart"
+                            @addToCart="addToCart"
                             @userOrderChoice="userOrderChoice"
                         />                        
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category === 'M').length">
                         <MenuCategories 
                             v-bind="mainProps"
-                            @decreaseOrder="decreaseOrder"
-                            @addOrder="addOrder"
+                            @decreaseFromCart="decreaseFromCart"
+                            @addToCart="addToCart"
                             @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='S').length">
                         <MenuCategories 
                             v-bind="sideProps"
-                            @decreaseOrder="decreaseOrder"
-                            @addOrder="addOrder"
+                            @decreaseFromCart="decreaseFromCart"
+                            @addToCart="addToCart"
                             @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='D').length">
                         <MenuCategories 
                             v-bind="dessertsProps"
-                            @decreaseOrder="decreaseOrder"
-                            @addOrder="addOrder"
+                            @decreaseFromCart="decreaseFromCart"
+                            @addToCart="addToCart"
                             @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='B').length">
                         <MenuCategories 
                             v-bind="beveragesProps"
-                            @decreaseOrder="decreaseOrder"
-                            @addOrder="addOrder"
+                            @decreaseFromCart="decreaseFromCart"
+                            @addToCart="addToCart"
                             @userOrderChoice="userOrderChoice"
                         />
                     </div>
                 </article>
                 <aside class="cart-container">
-                    <div class="cart-empty-container" v-if="!orderList.order_item">
+                    <div class="cart-empty-container" v-if="!orderList.order_item.length">
                         <h1>Cart Empty</h1>
                         <div class="cart-empty-img">
                             <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_480/Cart_empty_-_menu_2x_ejjkf2" alt="empty cart">
                         </div>
                         <p>Good food is always cooking! Go ahead, order some yummy items from the menu.</p>
                     </div>
-                    <div class="cart-full-container" v-else-if="orderList.order_item">
+                    <div class="cart-full-container" v-else-if="orderList.order_item.length">
                         <h1>Cart</h1>
                         <div class="cart-receipt-list">
                             <div class="cart-receipt-list-item" v-for="order in orderList.order_item" :key="order.order_menu_id">
                                 <span class="cart-item-name">{{ order.order_item_name.menu_item }}</span>
                                 <div class="cart-receipt-toggle-btns">
-                                    <button class="cart-btn-decrease" @click="decreaseCart(order.order_item_name.menu_id)">-</button>
+                                    <button class="cart-btn-decrease" @click="decreaseFromCart(order.order_item_name.menu_id)">-</button>
                                     <span>{{ order.order_item_quantity }}</span>
-                                    <button class="cart-btn-add" @click="addCart(order.order_item_name.menu_id)">+</button>
+                                    <button class="cart-btn-add" @click="addToCart(order.order_item_name.menu_id)">+</button>
                                 </div>
                                 <span class="cart-item-cost">${{ order.order_item_quantity * order.order_item_name.menu_price }}</span>
                             </div>
@@ -187,39 +187,40 @@
             </section>
         </section>
         <section v-else-if="menuList.dataState == 'ERROR'">
-            error happened with the menu
+            <Error message="Page not found" />
         </section>
     </section>
     <section v-else-if="restaurantList.dataState == 'ERROR'">
-        error happened with restaurant
+        <Error message="Page not found"/>
     </section>
-    <!-- <div class="cart-error-message">
-        <p>The Baker's Dozen is currently closed. Please try some other restaurants.</p>
-    </div> -->
-
 </template>
 
 <script lang="ts">
-import { DATASTATE, Discount, FetchResponse, Menu, Order, OrderItem, ResponseAppState, Restaurant } from '@/types/fetch-types';
+import { Discount, FetchResponse, Menu, Order, ResponseAppState, Restaurant } from '@/types/fetch-types';
 import { computed, defineComponent, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import MenuCategories from '../components/MenuCategories.vue'
+import Error from '../components/Error.vue';
+import Loading from '../components/Loading.vue';
+import { useFetch } from '../utils/useFetch';
+import { useStore } from 'vuex';
 
 export default defineComponent({
     components:{
         MenuCategories,
+        Error,
+        Loading,
     },
     setup () {
         let isToggled = ref(false);
-        let fetchRestaurant= {} as ResponseAppState<FetchResponse<Restaurant<Discount>>>;
         let restaurantList = ref({} as ResponseAppState<FetchResponse<Restaurant<Discount>>>);
-        let fetchMenu = {} as ResponseAppState<FetchResponse<Menu>>;
         let menuList = ref({} as ResponseAppState<FetchResponse<Menu>>);
+        let menuArray = ref([] as Menu[]);
         let route = useRoute();
         let router = useRouter();
         let restaurant_id = ref(route.params.id);
         let userFilter = ref("");
-        let orderList = ref({} as Order);
+        let store = useStore();
 
         // component functions/methods
         const toggleView = () => {
@@ -244,66 +245,20 @@ export default defineComponent({
             })
         }
         const userOrderChoice = (item:Menu) => {
-            let order:OrderItem = {
-                    order_item_id:"",
-                order_item_name:item,
-                order_item_quantity:1,
-                order_reference:"",
-                order_restaurant:item.restaurant.restaurant_id
-            }
-
-            // check local state to set with new or existing values
-            let localState = localStorage.getItem('cart');
-            if(!localState){ // no state yet
-                orderList.value = {
-                    order_id:"",
-                    order_item:[order],
-                    cart_quantity:order.order_item_quantity,
-                    cart_cost:order.order_item_quantity * order.order_item_name.menu_price
-                };
-                localStorage.setItem('cart',JSON.stringify(orderList.value));
-            } else { // state is present
-                let currentState:Order = JSON.parse(localState);
-                let order_items = [...currentState.order_item,order];
-
-                orderList.value = {
-                    ...currentState,
-                    order_item:order_items,
-                    cart_quantity:order_items.reduce((acc,val)=> acc + val.order_item_quantity,0),
-                    cart_cost:order_items.reduce((acc,val)=> acc + (val.order_item_quantity * val.order_item_name.menu_price),0)
-                }
-                localStorage.setItem('cart',JSON.stringify(orderList.value));                
-            }
-
-            // set the menu list to reflect current order values
-            let index:number = menuList.value.appData!.data.findIndex((x)=>x.menu_id === item.menu_id);
-            menuList.value.appData!.data[index].menu_orderQuantity = 1;
-            
+            store.dispatch('cart/initCartAction',{item,menuList});
         }
         const clearSearch = () => {
             let search = document.querySelector("#search") as HTMLInputElement;
             search.value = "";
             userFilter.value = "";
         }
-        const decreaseOrder = (id:string) => {
-            let index:number = menuList.value.appData!.data.findIndex(x=>x.menu_id === id);
-            let quantity:number = menuList.value.appData!.data[index].menu_orderQuantity - 1;
-            decreaserHelper(quantity,index,id);
+        const decreaseFromCart = (id:string) => {
+            menuArray.value = menuList.value.appData!.data;
+            store.dispatch('cart/removeFromCartAction',{id,menuList:menuArray});
         }
-        const decreaseCart = (id:string) => {
-            let index:number = menuList.value.appData!.data.findIndex(x=>x.menu_id === id);
-            let quantity:number = menuList.value.appData!.data[index].menu_orderQuantity - 1;
-            decreaserHelper(quantity,index,id);
-        }
-        const addOrder = (id:string) => {
-            let index:number = menuList.value.appData!.data.findIndex(x=>x.menu_id === id);
-            let quantity:number = menuList.value.appData!.data[index].menu_orderQuantity + 1;
-            addHelper(quantity,index,id);
-        }
-        const addCart = (id:string) => {
-            let index:number = menuList.value.appData!.data.findIndex(x=>x.menu_id === id);
-            let quantity:number = menuList.value.appData!.data[index].menu_orderQuantity + 1;
-            addHelper(quantity,index,id);
+        const addToCart = (id:string) => {
+            menuArray.value = menuList.value.appData!.data;
+            store.dispatch('cart/addToCartAction',{id,menuList:menuArray});
         }
         const categoryScroll = (e:any) => {
             e.preventDefault();
@@ -356,8 +311,15 @@ export default defineComponent({
             }
         }
         const checkout = () => {
-            router.push({path:"/checkout"});
-            window.scrollTo({top:0,behavior:'smooth'});
+            // check cart to see if all items are from the same restaurant
+            const validator = orderList.value.order_item[0].order_item_name.restaurant;
+            const validationTest = orderList.value.order_item.every(val=> val.order_item_name.restaurant === validator);
+            if(validationTest){
+                router.push({path:"/checkout"});
+                window.scrollTo({top:0,behavior:'smooth'});
+            } else {
+                alert("Please make sure all cart items are from the same restaurant");
+            }
         }
 
         // computed functions
@@ -365,112 +327,34 @@ export default defineComponent({
             menuList.value.appData!.data.filter(x=>
                 x.menu_item.toLowerCase().includes(userFilter.value.toLowerCase())
             ))
+        const orderList = computed<Order>(()=> store.state.cart.order);
+        const userLocation = computed(() => store.state.location.state.location);
 
+        
         // fetches
         const getRestaurant = async() => {
-            fetchRestaurant = {
-                ...fetchRestaurant,
-                dataState:DATASTATE.loading
-            };
-            restaurantList.value = fetchRestaurant;
-            try {
-                const response = await fetch(`http://localhost:8000/api/v1/restaurants/${restaurant_id.value}/`);
-                const data:FetchResponse<Restaurant<Discount>> = await response.json();
-
-                fetchRestaurant = {
-                    ...fetchRestaurant,
-                    dataState:DATASTATE.success,
-                    appData:data,
-                    error:""
-                };
-                restaurantList.value = fetchRestaurant;
-            } catch (error:any) {
-                fetchRestaurant = {
-                    ...fetchRestaurant,
-                    dataState:DATASTATE.error,
-                    error
-                }
-                restaurantList.value = fetchRestaurant;
-            }
+            let { dataState, data, errorMsg } = await useFetch<FetchResponse<Restaurant<Discount>>>(`http://localhost:8000/api/v1/restaurants/${restaurant_id.value}/`);
+            restaurantList.value.dataState = dataState.value;
+            restaurantList.value.appData = data.value as FetchResponse<Restaurant<Discount>>;
+            restaurantList.value.error = errorMsg.value;
         }
         const getMenu = async() => {
-            fetchMenu = {
-                ...fetchMenu,
-                dataState:DATASTATE.loading
-            };
-            menuList.value = fetchMenu;
-            try {
-                let response = await fetch(`http://localhost:8000/api/v1/menu/restaurant/${restaurant_id.value}`);
-                let data = await response.json();
-                
-                let cartState = localStorage.getItem('cart');
-                if(cartState){
-                    orderList.value = JSON.parse(cartState);
-                    orderList.value.order_item.forEach(order=>{
-                        let index = data.data.findIndex((x:Menu)=>x.menu_id === order.order_item_name.menu_id);
-                        data.data[index].menu_orderQuantity = order.order_item_quantity;
-                    })
-                } 
-
-                fetchMenu = {
-                    ...fetchMenu,
-                    dataState:DATASTATE.success,
-                    appData:data,
-                    error:""
-                }
-                
-                menuList.value = fetchMenu;                
-            } catch (error:any) {
-                fetchMenu = {
-                    ...fetchMenu,
-                    dataState:DATASTATE.error,
-                    error
-                }
-                menuList.value = fetchMenu;
-            }
+            let { dataState, data, errorMsg } = await useFetch<FetchResponse<Menu>>(`http://localhost:8000/api/v1/menu/restaurant/${restaurant_id.value}`);
+            menuList.value.dataState = dataState.value;
+            menuList.value.appData = data.value as FetchResponse<Menu>;
+            menuList.value.error = errorMsg.value;
+            store.dispatch('cart/setCartAction',menuList.value.appData.data);
         }
 
-        // helper functions
-        const decreaserHelper = (quantity:number,index:number,id:string) => {
-            // check if quantity is zero or 1+
-            if(!quantity){
-                // sets menu quantity value to zero and removes order from state
-                menuList.value.appData!.data[index].menu_orderQuantity = 0;
-                orderList.value.order_item = orderList.value.order_item.filter(x=>x.order_item_name.menu_id !== id);
-            } else {
-                // sets menu quantity with new quantity along with the order state
-                menuList.value.appData!.data[index].menu_orderQuantity = quantity;    
-                let indexOrder = orderList.value.order_item.findIndex(x=>x.order_item_name.menu_id === id);
-                orderList.value.order_item[indexOrder].order_item_quantity = quantity;
-            }
-            // sets cart quantity and cost values
-            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_item_quantity,0);
-            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_item_quantity * val.order_item_name.menu_price),0);
-
-            // removes or sets localstorage depending on quantity and length of order state
-            if(!orderList.value.order_item.length){
-                localStorage.removeItem('cart');
-                orderList.value = {} as Order;
-            } else {
-                localStorage.setItem('cart',JSON.stringify(orderList.value));
-            }
-        }
-        const addHelper = (quantity:number,index:number,id:string) =>{
-            // sets menu quantity
-            menuList.value.appData!.data[index].menu_orderQuantity = quantity;
-
-            // sets order state for new quantity
-            let indexOrder = orderList.value.order_item.findIndex(x=>x.order_item_name.menu_id === id);
-            orderList.value.order_item[indexOrder].order_item_quantity = quantity;
-            orderList.value.cart_quantity = orderList.value.order_item.reduce((acc,val)=>acc + val.order_item_quantity,0);
-            orderList.value.cart_cost = orderList.value.order_item.reduce((acc,val)=>acc + (val.order_item_quantity * val.order_item_name.menu_price),0);
-            localStorage.setItem('cart',JSON.stringify(orderList.value));
-        }
 
         // lifecycle hooks
         onMounted(()=>{
             getRestaurant();
             getMenu();
+            store.dispatch('location/setLocationAction',"");
+            if(!userLocation.value){
+                router.push({name:"Home"});
+            }
         });
 
          // props
@@ -527,18 +411,16 @@ export default defineComponent({
             filterDishes,
             orderList,
             clearSearch,
-            decreaseOrder,
-            addOrder,
             categoryScroll,
-            decreaseCart,
-            addCart,
             breakfastProps,
             mainProps,
             sideProps,
             dessertsProps,
             beveragesProps,
             searchProps,
-            checkout
+            checkout,
+            addToCart,
+            decreaseFromCart
         }
     }
 })

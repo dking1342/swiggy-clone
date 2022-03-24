@@ -1,4 +1,4 @@
-import { Route } from "@/types";
+import { Route } from "@/types/route";
 import { createRouter, createWebHistory } from "vue-router";
 import Restaurants from '../components/Restaurants.vue'
 import Restaurant from '../components/Restaurant.vue'

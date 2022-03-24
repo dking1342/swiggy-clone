@@ -15,7 +15,7 @@ export interface ResponseAppState<T> {
 export interface FetchResponse<T> {
     timestamp:Date | string,
     status:string,
-    status_code:string,
+    status_code:number,
     message:string,
     data:T[]
 }
@@ -34,7 +34,7 @@ export interface Restaurant<T> {
     discounts:T,
     restaurant_cost:number,
     restaurant_rating:number,
-    restaurant_created:Date | string
+    restaurant_created?:Date | string
 }
 
 export interface Discount {
@@ -42,7 +42,7 @@ export interface Discount {
     discount_code:string,
     discount_text:string,
     discount_amount:number,
-    discount_created:Date | string
+    discount_created?:Date | string
 }
 
 export interface Cuisine {
@@ -62,7 +62,7 @@ export interface Menu {
     menu_isBestseller:boolean,
     restaurant:Restaurant<Discount>,
     menu_created:Date | string,
-    menu_orderQuantity:number
+    menu_orderQuantity?:number
 }
 
 export interface OrderItem {
@@ -102,5 +102,13 @@ export interface Rating {
     rating_rate:number,
     rating_order_reference:string,
     rating_restaurant:string
+}
+
+export interface UserInfo {
+    user_id:string,
+    user_name:string,
+    user_phone:string,
+    user_email:string,
+    token?:string,
 }
 

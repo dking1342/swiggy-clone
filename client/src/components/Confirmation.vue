@@ -1,6 +1,6 @@
 <template>
     <section v-if="responseStatus == 'LOADING'">
-        loading...
+        <Loading />
     </section>
     <section v-else-if="responseStatus == 'SUCCESS'">
         <div class="order-confirmation-container" >
@@ -79,24 +79,31 @@
         </div>
     </section>
     <section v-else-if="responseStatus == 'ERROR'">
-        error
+        <Error message="Page not found" />
     </section>
 </template>
 
 <script lang="ts">
-import { DATASTATE, FetchResponse, OrderConfirmationItem, Rating, ResponseAppState } from '@/types/fetch-types';
+import { DATASTATE, FetchResponse, Order, OrderConfirmationItem, Rating, ResponseAppState } from '@/types/fetch-types';
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router';
+import Error from '../components/Error.vue';
+import Loading from '../components/Loading.vue';
+import { useAPICall, useFetch } from '../utils/useFetch';
 
 export default defineComponent({
+    components:{
+        Error,
+        Loading,
+    },
     setup () {
         const route = useRoute();
         let hasRated = ref(false);
         let toggleViewOrder = ref(false);
         let ratingBtnArray = ref([1,2,3,4,5]);
-        let orderResponse = {} as ResponseAppState<FetchResponse<OrderConfirmationItem>>;
+        // let orderResponse = {} as ResponseAppState<FetchResponse<OrderConfirmationItem>>;
         let orderResponseRef = ref({} as ResponseAppState<FetchResponse<OrderConfirmationItem>>)
-        let ratingResponse = {} as ResponseAppState<FetchResponse<Rating>>;
+        // let ratingResponse = {} as ResponseAppState<FetchResponse<Rating>>;
         let ratingResponseRef = ref({} as ResponseAppState<FetchResponse<Rating>>);
         let ratingCheckResponse = {} as ResponseAppState<FetchResponse<Rating>>;
         let ratingCheckResponseRef = ref({} as ResponseAppState<FetchResponse<Rating>>);
@@ -111,51 +118,6 @@ export default defineComponent({
                 orders.classList.add('drawer-open');
             } else {
                 orders.classList.remove('drawer-open');
-            }
-        }
-        const rateRestaurant = async (rating:number) => {
-            ratingResponse = {
-                ...ratingResponse,
-                dataState:DATASTATE.loading
-            }
-            ratingResponseRef.value = ratingResponse;
-            try {
-                let payload:Rating = {
-                    rating_id:"",
-                    rating_rate:rating,
-                    rating_order_reference:orderId.value!,
-                    rating_restaurant:orderRestaurant.value!
-                }
-                const response = await fetch('http://localhost:8000/api/v1/rating/create/',{
-                    method: 'POST', 
-                    mode: 'cors', 
-                    cache: 'no-cache', 
-                    credentials: 'same-origin', 
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    redirect: 'follow',
-                    referrerPolicy: 'no-referrer',
-                    body: JSON.stringify(payload) 
-                });
-                const data = await response.json();
-                hasRated.value = true;
-                
-                ratingResponse = {
-                    ...ratingResponse,
-                    dataState:DATASTATE.success,
-                    appData:data,
-                    error:""
-                }
-                ratingResponseRef.value = ratingResponse;
-
-            } catch (error:any) {
-                ratingResponse = {
-                    ...ratingResponse,
-                    dataState:DATASTATE.error,
-                    error
-                }
-                ratingResponseRef.value = ratingResponse;
             }
         }
 
@@ -175,58 +137,41 @@ export default defineComponent({
         // fetches
         const getOrder = async () => {
             const confirmation_id = route.params.id as string;
-            orderResponse = {
-                ...orderResponse,
-                dataState:DATASTATE.loading
-            }
-            orderResponseRef.value = orderResponse;
-            try {
-                const response = await fetch(`http://localhost:8000/api/v1/cart/get/${confirmation_id}`);
-                const data = await response.json();
-
-                orderResponse = {
-                    ...orderResponse,
-                    dataState:DATASTATE.success,
-                    appData:data,
-                    error:""
-                }
-                orderResponseRef.value = orderResponse;
-            } catch (error:any) {
-                orderResponse = {
-                    ...orderResponse,
-                    dataState:DATASTATE.error,
-                    error
-                }
-                orderResponseRef.value = orderResponse;
-            }
+            let { dataState, data, errorMsg } = await useFetch<FetchResponse<Order>>(`http://localhost:8000/api/v1/cart/get/${confirmation_id}`);
+            orderResponseRef.value.dataState = dataState.value;
+            orderResponseRef.value.appData = data.value as FetchResponse<OrderConfirmationItem>;
+            orderResponseRef.value.error = errorMsg.value;
         }
         const checkRating = async () => {
-            ratingCheckResponse = {
-                ...ratingCheckResponse,
-                dataState:DATASTATE.loading
-            }
-            ratingCheckResponseRef.value = ratingCheckResponse;
-            try {
-                const response = await fetch(`http://localhost:8000/api/v1/rating/get/${orderId.value}/`);
-                const data = await response.json();
+            let { dataState, data, errorMsg } = await useFetch<FetchResponse<Rating>>(`http://localhost:8000/api/v1/rating/get/${orderId.value}/`);
+            ratingCheckResponseRef.value.dataState = dataState.value;
+            ratingCheckResponseRef.value.error = errorMsg.value;
+            ratingCheckResponseRef.value.appData = data.value as FetchResponse<Rating>;
 
-                if(data.data.length){
-                    hasRated.value = true;
-                    ratingCheckResponseRef.value = ratingCheckResponse;
-                } else {
-                    hasRated.value = false;
-                }
-                
-            } catch (error:any) {
-                ratingCheckResponse = {
-                    ...ratingCheckResponse,
-                    dataState:DATASTATE.error,
-                    error
-                }
+            if(ratingCheckResponseRef.value.appData.data.length){
+                hasRated.value = true;
                 ratingCheckResponseRef.value = ratingCheckResponse;
+            } else {
+                hasRated.value = false;
             }
         }
+        const rateRestaurant = async (rating:number) => {
+            let payload:Rating = {
+                rating_id:"",
+                rating_rate:rating,
+                rating_order_reference:orderId.value!,
+                rating_restaurant:orderRestaurant.value!
+            }
 
+            let { dataState, data, errorMsg } = await useAPICall<FetchResponse<Rating>>('http://localhost:8000/api/v1/rating/create/',payload,"POST");
+            ratingResponseRef.value.dataState = dataState.value;
+            ratingResponseRef.value.error = errorMsg.value;
+            ratingResponseRef.value.appData = data.value as FetchResponse<Rating>;
+            
+            if(dataState.value === DATASTATE.success){
+                hasRated.value = true;
+            }
+        }
 
         // lifecycle hooks
         onMounted(()=>{

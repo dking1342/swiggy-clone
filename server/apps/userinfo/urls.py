@@ -5,6 +5,7 @@ app_name = "userinfo"
 
 urlpatterns = [
     path("routes/", views.getRoutes, name="routes"),
-    path("<uuid:pk>/", views.getUserinfo, name="user"),
-    path("", views.getUserinfos, name="users"),
+    path("get/<str:pk>/", views.get_user_info, name="user"),
+    path("create/", views.create_user, name="create_user"),
+    path("", views.get_users_info, name="users"),
 ]

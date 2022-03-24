@@ -1,4 +1,4 @@
-import { Order } from "./types/fetch-types";
+import { Order } from "../types/fetch-types";
 
 
 const addOrder = (id:string,state:Order) => {

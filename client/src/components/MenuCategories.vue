@@ -45,9 +45,9 @@
                 <div class="menu-card-btn-wrapper">
                     <button v-if="!orderList?.value.order_item?.filter(x=>x.order_item_name.menu_id === menu.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',menu)">Add</button>
                     <div v-else-if="orderList?.value.order_item?.filter(x=>x.order_item_name.menu_id === menu.menu_id).length" class="menu-card-btn-tray">
-                        <button class="decrease-btn" @click="$emit('decreaseOrder',menu.menu_id)">-</button>
+                        <button class="decrease-btn" @click="$emit('decreaseFromCart',menu.menu_id)">-</button>
                         <span>{{ menu.menu_orderQuantity }}</span>
-                        <button class="add-btn" @click="$emit('addOrder',menu.menu_id)">+</button>
+                        <button class="add-btn" @click="$emit('addToCart',menu.menu_id)">+</button>
                     </div>
                 </div>
             </div>
@@ -70,8 +70,8 @@ export default defineComponent({
         filterDishes:Object
     },
     emits:[
-        'decreaseOrder',
-        'addOrder',
+        'decreaseFromCart',
+        'addToCart',
         'userOrderChoice',
     ],
     setup () {
