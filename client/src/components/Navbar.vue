@@ -15,11 +15,11 @@
       </div>
     </div>
     <div class="right-nav">
-        <router-link to="#" v-if="!isNavbarElementShowing && !isHomeView"><span data-before-content="Search" class="link-icon">🔎</span> <span class="link-text">Search</span></router-link>
+        <router-link to="/search" v-if="!isNavbarElementShowing && !isHomeView"><span data-before-content="Search" class="link-icon">🔎</span> <span class="link-text">Search</span></router-link>
         <router-link to="#" v-if="!isNavbarElementShowing"><span data-before-content="Offers" class="link-icon">%</span> <span class="link-text">Offers</span></router-link>
         <router-link to="#" ><span data-before-content="Help" class="link-icon">🙋🏻‍♂️</span> <span class="link-text">Help</span></router-link>
         <router-link to="#" v-if="!loginStatus" @click="toggleSignInView"><span data-before-content="Sign In" class="link-icon">✏️</span> <span class="link-text">Sign In</span></router-link>
-        <router-link to="#" v-if="loginStatus" @click="logout"><span data-before-content="Logout" class="link-icon"></span> <span class="link-text">Logout</span></router-link>
+        <router-link to="#" v-if="loginStatus" @click="logout"><span data-before-content="Logout" class="link-icon">🔓</span> <span class="link-text">Logout</span></router-link>
         <router-link to="/checkout" v-if="!isNavbarElementShowing && !isHomeView" class="cart-link"><span data-before-content="Cart" class="link-icon">🧺</span> <span class="link-text">Cart</span><p v-if="cartQuantity > 0" class="cart-badge">{{ cartQuantity > 9 ? "9+" : cartQuantity }}</p></router-link>
     </div>
   </nav>

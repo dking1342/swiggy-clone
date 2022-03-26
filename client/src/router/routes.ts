@@ -5,6 +5,7 @@ import Restaurant from '../components/Restaurant.vue'
 import Home from '../components/Home.vue';
 import Checkout from '../components/Checkout.vue';
 import Confirmation from '../components/Confirmation.vue';
+import Search from '../components/Search.vue';
 
 const routes:Route[] = [
     {
@@ -31,6 +32,11 @@ const routes:Route[] = [
         path:"/confirmation/:id",
         name:"Confirmation",
         component:Confirmation
+    },
+    {
+        path:"/search",
+        name:"Search",
+        component:Search
     }
 ]
 

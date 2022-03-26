@@ -5,13 +5,9 @@
             <h1 v-else>No restaurants</h1>
         </div>
         <div class="right-header" v-if="restaurantCount">
-            <select name="links" class="link-dropdown" @change="sortRestaurantsDropdown">
-                <option value="null" selected disabled>Sort Restaurants</option>
-                <option value="Discounts">Discounts</option>
-                <option value="Rating">Rating</option>
-                <option value="Lowest cost">Lowest Cost</option>
-                <option value="Highest cost">Highest Cost</option>
-            </select>
+            <SelectSortRestaurant 
+                @sortRestaurantsDropdown = "sortRestaurantsDropdown($event)"
+            />
             <span class="link-wrapper"><router-link to="#" class="header-search" @click="sortRestaurants">Discounts</router-link></span>
             <span class="link-wrapper"><router-link to="#" class="header-search" @click="sortRestaurants">Rating</router-link></span>
             <span class="link-wrapper"><router-link to="#" class="header-search" @click="sortRestaurants">Lowest Cost</router-link></span>
@@ -24,23 +20,9 @@
     </section>
     <section v-else-if="htmlOutput.dataState === 'SUCCESS' && restaurantCount">
         <div v-for="restaurant in htmlOutput.appData.data" :key="restaurant.restaurant_id" class="card">
-            <button @click="navigateUser(restaurant.restaurant_id)" class="card-button-link">
-                <div class="card-img">
-                    <img :src="restaurant.restaurant_main_img" :alt="restaurant.restaurant_name">
-                </div>
-                <div class="card-header">
-                    <h1>{{ restaurant.restaurant_name }}</h1>
-                    <h2>{{ restaurant.restaurant_cuisines.join(", ") }}</h2>
-                </div>
-                <div class="card-body">
-                    <div v-if="Number(restaurant.restaurant_rating) === 0.0" :class="[restaurant.restaurant_rating < 4 ? 'card-body-low-rating' : 'card-body-high-rating']">⭐️ --</div>
-                    <div v-else-if="Number(restaurant.restaurant_rating) !== 0" :class="[restaurant.restaurant_rating < 4 ? 'card-body-low-rating' : 'card-body-high-rating']">⭐️ {{ restaurant.restaurant_rating }}</div>
-                    <div>₹{{ restaurant.restaurant_cost }} FOR TWO</div>
-                </div>
-                <div v-show="restaurant.discount_isValid" class="card-discounts">
-                    <span>{{ restaurant.discounts.discount_text}}</span>
-                </div>
-            </button>
+            <RestaurantItem 
+                :restaurant="restaurant"
+            />
         </div>
     </section>
     <section v-else-if="htmlOutput.dataState === 'SUCCESS' && !restaurantCount">
@@ -80,11 +62,15 @@ import { useFetch } from '../utils/useFetch';
 import { useStore } from 'vuex';
 import Error from '../components/Error.vue';
 import Loading from '../components/Loading.vue';
+import RestaurantItem from '../components/RestaurantItem.vue';
+import SelectSortRestaurant from '../components/SelectSortRestaurant.vue';
 
 export default defineComponent({
     components:{
         Error,
         Loading,
+        RestaurantItem,
+        SelectSortRestaurant,
     },
     setup () {
         let isModalShowing = true;
@@ -111,6 +97,7 @@ export default defineComponent({
 
         }
         const sortRestaurantsDropdown = (e:any) => {
+
             let elementText = e.target.value;
             let elementTextContent = e.target.value.toLowerCase();
             sortHelper(elementText,elementTextContent);
@@ -142,14 +129,6 @@ export default defineComponent({
                 filterModal.style.opacity="1";
                 filterModal.style.transition="all 1.25s ease-in";
             }
-        }
-        const navigateUser = (id:string) => {
-            router.push({
-                name:"Restaurant",
-                params:{
-                    id
-                }
-            })
         }
         const clearFilter = () => {
             // unchecks all inputs
@@ -287,7 +266,6 @@ export default defineComponent({
             toggleFilterModal,
             fetchResult,
             htmlOutput,
-            navigateUser,
             restaurantCount,
             cuisineList,
             clearFilter,
@@ -377,7 +355,7 @@ section{
     transform:scale(1.00);
     transition: all 0.5s ease-in-out;
 }
-.card-button-link{
+/* .card-button-link{
     background-color: transparent;
     outline: none;
     border:none;
@@ -439,7 +417,7 @@ section{
 }
 .card-discounts span{
     color:#8a584b;
-}
+} */
 
 .filter-overlay{
     width: 100vw;

@@ -32,25 +32,10 @@
             <p>{{ menuList.value.appData.data.filter(x=> x.menu_category === menuCategory).length }} items</p>
         </div>
         <div class="menu-card" v-for="menu in menuList.value.appData.data.filter(x=>x.menu_category === menuCategory)" :key="menu.menu_id">
-            <div class="menu-card-body">
-                <div><span v-if="menu.menu_isBestseller">⭐️ Bestseller</span></div>
-                <div><h2>{{ menu.menu_item }}</h2></div>
-                <div><h3>${{ menu.menu_price}}</h3></div>
-                <div><p>{{ menu.menu_description }}</p></div>
-            </div>
-            <div class="menu-card-img">
-                <div class="menu-card-img-wrapper">
-                    <img :src="menu.menu_image" :alt="menu.menu_item">
-                </div>
-                <div class="menu-card-btn-wrapper">
-                    <button v-if="!orderList?.value.order_item?.filter(x=>x.order_item_name.menu_id === menu.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',menu)">Add</button>
-                    <div v-else-if="orderList?.value.order_item?.filter(x=>x.order_item_name.menu_id === menu.menu_id).length" class="menu-card-btn-tray">
-                        <button class="decrease-btn" @click="$emit('decreaseFromCart',menu.menu_id)">-</button>
-                        <span>{{ menu.menu_orderQuantity }}</span>
-                        <button class="add-btn" @click="$emit('addToCart',menu.menu_id)">+</button>
-                    </div>
-                </div>
-            </div>
+            <MenuItem 
+                :menu="menu"
+                :menuList="menuList"
+            />
         </div>
 
     </div>
@@ -58,31 +43,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,  } from 'vue'
+import { Order } from '@/types/fetch-types';
+import { computed, defineComponent,  } from 'vue';
+import MenuItem from './MenuItem.vue';
+import { useStore } from 'vuex';
 
 export default defineComponent({
+    components:{
+        MenuItem
+    },
     props:{
         menuList:Object,
         headerId:String,
         headerText:String,
         menuCategory:String,
-        orderList:Object,
         filterDishes:Object
     },
-    emits:[
-        'decreaseFromCart',
-        'addToCart',
-        'userOrderChoice',
-    ],
     setup () {
-
- 
-
-
-
+        const store = useStore();
+        const orderList = computed<Order>(()=> store.state.cart.order);
 
         return {
-            
+            orderList,
         }
     }
 })
@@ -166,7 +148,7 @@ export default defineComponent({
     .menu-card:last-child{
         border-bottom: none;
     }
-    .menu-card-body{
+    /* .menu-card-body{
         display: flex;
         flex-direction: column;
         gap:10px;
@@ -253,7 +235,7 @@ export default defineComponent({
         font-size: 12px;
         font-weight: 500;
         color:#60b246;
-    }
+    } */
 
     @media (max-width:1150px) {
     .menu-container{

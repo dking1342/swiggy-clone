@@ -3,32 +3,39 @@
         <img src="https://res.cloudinary.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/connection_error_bsppck" alt="error image">
         <h1>Oops! Looks like something went wrong</h1>
         <p>{{ errorMessage }}</p>
-        <button @click="sendHome">Go Home</button>
+        <button v-if="isShowingBtn" @click="sendHome">Go Home</button>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 export default defineComponent({
     props:{
-        message:String
+        message:String,
+        showBtn:Boolean,
     },
     setup (props) {
         const errorMessage = ref(props.message);
         const router = useRouter();
         const store = useStore();
+        let isShowingBtn = ref<boolean>(true);
 
         const sendHome = () => {
             store.dispatch('location/removeLocationAction');
             router.push({name:"Home"});
         }
 
+        onMounted(()=>{
+            isShowingBtn.value = props.showBtn;
+        })
+
         return {
             errorMessage,
             sendHome,
+            isShowingBtn,
         }
     }
 })

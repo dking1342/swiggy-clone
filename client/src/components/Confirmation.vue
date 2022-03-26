@@ -101,9 +101,7 @@ export default defineComponent({
         let hasRated = ref(false);
         let toggleViewOrder = ref(false);
         let ratingBtnArray = ref([1,2,3,4,5]);
-        // let orderResponse = {} as ResponseAppState<FetchResponse<OrderConfirmationItem>>;
         let orderResponseRef = ref({} as ResponseAppState<FetchResponse<OrderConfirmationItem>>)
-        // let ratingResponse = {} as ResponseAppState<FetchResponse<Rating>>;
         let ratingResponseRef = ref({} as ResponseAppState<FetchResponse<Rating>>);
         let ratingCheckResponse = {} as ResponseAppState<FetchResponse<Rating>>;
         let ratingCheckResponseRef = ref({} as ResponseAppState<FetchResponse<Rating>>);

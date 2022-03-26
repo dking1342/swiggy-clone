@@ -75,49 +75,31 @@
                     <div v-if="userFilter">
                         <MenuCategories 
                             v-bind="searchProps"
-                            @decreaseFromCart="decreaseFromCart"
-                            @addToCart="addToCart"
-                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category === 'BR').length">
                         <MenuCategories 
                             v-bind="breakfastProps"
-                            @decreaseFromCart="decreaseFromCart"
-                            @addToCart="addToCart"
-                            @userOrderChoice="userOrderChoice"
                         />                        
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category === 'M').length">
                         <MenuCategories 
                             v-bind="mainProps"
-                            @decreaseFromCart="decreaseFromCart"
-                            @addToCart="addToCart"
-                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='S').length">
                         <MenuCategories 
                             v-bind="sideProps"
-                            @decreaseFromCart="decreaseFromCart"
-                            @addToCart="addToCart"
-                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='D').length">
                         <MenuCategories 
                             v-bind="dessertsProps"
-                            @decreaseFromCart="decreaseFromCart"
-                            @addToCart="addToCart"
-                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                     <div v-if="menuList.appData.data.filter(x=>x.menu_category ==='B').length">
                         <MenuCategories 
                             v-bind="beveragesProps"
-                            @decreaseFromCart="decreaseFromCart"
-                            @addToCart="addToCart"
-                            @userOrderChoice="userOrderChoice"
                         />
                     </div>
                 </article>
@@ -243,9 +225,6 @@ export default defineComponent({
                 behavior:'smooth',
                 top:0
             })
-        }
-        const userOrderChoice = (item:Menu) => {
-            store.dispatch('cart/initCartAction',{item,menuList});
         }
         const clearSearch = () => {
             let search = document.querySelector("#search") as HTMLInputElement;
@@ -407,7 +386,6 @@ export default defineComponent({
             userFilter,
             toggleView,
             userFilterInput,
-            userOrderChoice,
             filterDishes,
             orderList,
             clearSearch,
@@ -658,94 +636,7 @@ header{
 .menu-card:last-child{
     border-bottom: none;
 }
-.menu-card-body{
-    display: flex;
-    flex-direction: column;
-    gap:10px;
-    align-items: flex-start;
-    justify-content: center;
-}
-.menu-card-body div{
-    width: 100%;
-}
-.menu-card-body span{
-    font-size: 12px;
-    color:#ee9c00;
-    font-weight: 500;
-}
-.menu-card-body h2{
-    font-size: 18px;
-    font-weight: 500;
-    color:#3e4152;
-    word-break:break-all;
-}
-.menu-card-body h3{
-    font-size: 14px;
-    font-weight: 400;
-    color:#3e4152;
-}
-.menu-card-body p{
-    color:rgba(40,44,63,.45);
-    font-size: 12px;
-}
-.menu-card-img{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-.menu-card-img-wrapper img{
-    width: 100%;
-    object-fit: contain;
-}
-.menu-card-btn-wrapper{
-    border:0.5px solid #ccc;
-    width: 75%;
-    height: 35px;
-    transform:translateY(-25px);
-}
-.init-btn{
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    outline:none;
-    border:none;
-    text-transform: uppercase;
-    font-weight: 700;
-    color:#60b246;
-}
-.menu-card-btn-tray{
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    background-color: #fff;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-.menu-card-btn-tray .add-btn,
-.menu-card-btn-tray .decrease-btn{
-    outline:none;
-    border:none;
-    background:transparent;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: 500;
-}
-.add-btn{
-    color:#60b246;
-}
-.decrease-btn{
-    color:#bebfc5;
-}
-.menu-card-btn-tray span{
-    font-size: 12px;
-    font-weight: 500;
-    color:#60b246;
-}
+
 .cart-container{
     max-height: 70vh;
     min-height: 500px;
@@ -1038,10 +929,6 @@ header{
     }
 }
 @media (max-width:500px) {
-    /* .menu-container{
-        background-color: red;
-        grid-template-columns: repeat(3,1fr );
-    } */
     .menu-card{
         grid-template-columns: 1fr;
         grid-template-rows: 70% 25%;
@@ -1049,45 +936,7 @@ header{
         align-items: flex-start;
         /* height: 100%; */
     }
-    .menu-card-body{
-        grid-row: 2/3;
-        display: grid;
-        grid-template-columns: repeat(12,1fr);
-        grid-auto-rows: auto;
-    }
-    .menu-card-body div:nth-child(1){
-        grid-column: 1/-1;
-        grid-row: 1/2;
-    }
-    .menu-card-body div:nth-child(2){
-        grid-column: 1/9;
-        grid-row: 2/3;
-    }
-    .menu-card-body div:nth-child(3){
-        grid-column: 10/-1;
-        grid-row: 2/3;
-        text-align: right;
-    }
-    .menu-card-body div:nth-child(4){
-        grid-row: 3/4;
-        grid-column: 1/-1;
-        padding-bottom: 25px;
-    }
-    .menu-card-img{
-        align-items: center;
-        justify-content: end;
-        grid-row: 1/2;
-    }
-    .menu-card-btn-wrapper{
-        width: 100%;
-        transform:translateY(-10px);
-        height: 50px;
-    }
-    .menu-card-img-wrapper img{
-        width: 300px;
-        object-fit: contain;
-        object-position: center;
-    }
+
     .header-main-content{
         gap:0px;
     }
