@@ -2,8 +2,8 @@
     <section v-if="restaurantList.dataState == 'LOADING'">
         <Loading />
     </section>
-    <section v-else-if="restaurantList.dataState == 'SUCCESS'">
-        <header >
+    <section v-else-if="restaurantList.dataState == 'SUCCESS'" @scroll="handleScroll" class="restaurant-body">
+        <header  >
             <div class="header-breadcrumb-container">
                 <router-link to="/"><span class="link-text">Home</span></router-link>
                 <span>/</span>
@@ -179,7 +179,7 @@
 
 <script lang="ts">
 import { Discount, FetchResponse, Menu, Order, ResponseAppState, Restaurant } from '@/types/fetch-types';
-import { computed, defineComponent, onMounted, ref } from 'vue'
+import { computed, defineComponent, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import MenuCategories from '../components/MenuCategories.vue'
 import Error from '../components/Error.vue';
@@ -300,6 +300,19 @@ export default defineComponent({
                 alert("Please make sure all cart items are from the same restaurant");
             }
         }
+        const handleScroll = () => {
+            console.log("width",window.innerWidth)
+            let headerElement = document.querySelector('header') as HTMLElement;
+            let bodyElement = document.querySelector('.restaurant-body') as HTMLDivElement;
+            if(window.scrollY > 80 && window.innerWidth > 890){
+                headerElement.classList.add('navbar-sticky');
+                bodyElement.classList.add('restaurant-body-sticky');
+            } else {
+                headerElement.classList.remove('navbar-sticky');
+                bodyElement.classList.remove('restaurant-body-sticky');
+            }
+            
+        }
 
         // computed functions
         const filterDishes = computed(()=> 
@@ -334,7 +347,14 @@ export default defineComponent({
             if(!userLocation.value){
                 router.push({name:"Home"});
             }
+            window.addEventListener('scroll',()=>handleScroll());
         });
+
+        onUnmounted(()=>{
+            window.removeEventListener('scroll',()=>handleScroll());
+        })
+
+        
 
          // props
         const breakfastProps = {
@@ -398,7 +418,8 @@ export default defineComponent({
             searchProps,
             checkout,
             addToCart,
-            decreaseFromCart
+            decreaseFromCart,
+            handleScroll,
         }
     }
 })
@@ -410,10 +431,10 @@ header{
     background-color: #fff;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
     margin:0 -5%;
+    transition:500ms ease all;
     /* position:fixed;
-    top:90px;
-    left: 0;
-    right:0; */
+    top:0;
+    z-index: 50; */
 }
 .header-breadcrumb-container{
     height: 30px;
@@ -864,6 +885,20 @@ header{
     border:none;
     color:#fff;
     font-weight: 500;
+}
+
+/* utility styles */
+.navbar-sticky{
+    position: fixed;
+    top: 0;
+    left:0;
+    right:0;
+    z-index: 5;
+    transition:500ms ease all;
+    padding:0 40px;
+}
+.restaurant-body-sticky{
+    margin-top: 350px;
 }
 
 @media (max-width:1150px) {

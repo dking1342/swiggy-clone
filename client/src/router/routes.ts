@@ -6,6 +6,8 @@ import Home from '../components/Home.vue';
 import Checkout from '../components/Checkout.vue';
 import Confirmation from '../components/Confirmation.vue';
 import Search from '../components/Search.vue';
+import Offers from '../components/Offers.vue';
+
 
 const routes:Route[] = [
     {
@@ -37,6 +39,11 @@ const routes:Route[] = [
         path:"/search",
         name:"Search",
         component:Search
+    },
+    {
+        path:"/offers",
+        name:"Offers",
+        component:Offers
     }
 ]
 

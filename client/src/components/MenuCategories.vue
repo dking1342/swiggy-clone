@@ -5,25 +5,10 @@
             <p>{{ filterDishes.value.length }} items</p>
         </div>
         <div class="menu-card" v-for="dishes in filterDishes.value" :key="dishes.menu_id">
-            <div class="menu-card-body">
-                <div><span v-if="dishes.menu_isBestseller">⭐️ Bestseller</span></div>
-                <div><h2>{{ dishes.menu_item }}</h2></div>
-                <div><h3>${{ dishes.menu_price}}</h3></div>
-                <div><p>{{ dishes.menu_description }}</p></div>
-            </div>
-            <div class="menu-card-img">
-                <div class="menu-card-img-wrapper">
-                    <img :src="dishes.menu_image" :alt="dishes.menu_item">
-                </div>
-                <div class="menu-card-btn-wrapper">
-                    <button v-if="!orderList?.value.order_item?.filter(x=>x.order_menu_id === dishes.menu_id).length" class="init-btn" @click="$emit('userOrderChoice',dishes)">Add</button>
-                    <div v-else-if="orderList?.value.order_item?.filter(x=>x.order_menu_id === dishes.menu_id).length" class="menu-card-btn-tray">
-                        <button class="decrease-btn" @click="$emit('decreaseOrder',dishes.menu_id)">-</button>
-                        <span>{{ dishes.menu_orderQuantity }}</span>
-                        <button class="add-btn" @click="$emit('addOrder',dishes.menu_id)">+</button>
-                    </div>
-                </div>
-            </div>
+            <MenuItem 
+                :menu="dishes"
+                :menuList="filterDishes"
+            />
         </div>        
     </div>
     <div v-else>
