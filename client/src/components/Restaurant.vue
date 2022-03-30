@@ -301,16 +301,15 @@ export default defineComponent({
             }
         }
         const handleScroll = () => {
-            console.log("width",window.innerWidth)
-            let headerElement = document.querySelector('header') as HTMLElement;
-            let bodyElement = document.querySelector('.restaurant-body') as HTMLDivElement;
-            if(window.scrollY > 80 && window.innerWidth > 890){
-                headerElement.classList.add('navbar-sticky');
-                bodyElement.classList.add('restaurant-body-sticky');
-            } else {
-                headerElement.classList.remove('navbar-sticky');
-                bodyElement.classList.remove('restaurant-body-sticky');
-            }
+            // let headerElement = document.querySelector('header') as HTMLElement;
+            // let bodyElement = document.querySelector('.restaurant-body') as HTMLDivElement;
+            // if(window.scrollY > 80 && window.innerWidth > 890){
+            //     headerElement.classList.add('navbar-sticky');
+            //     bodyElement.classList.add('restaurant-body-sticky');
+            // } else {
+            //     headerElement.classList.remove('navbar-sticky');
+            //     bodyElement.classList.remove('restaurant-body-sticky');
+            // }
             
         }
 
@@ -347,11 +346,11 @@ export default defineComponent({
             if(!userLocation.value){
                 router.push({name:"Home"});
             }
-            window.addEventListener('scroll',()=>handleScroll());
+            window.addEventListener('scroll',handleScroll);
         });
 
         onUnmounted(()=>{
-            window.removeEventListener('scroll',()=>handleScroll());
+            window.removeEventListener('scroll',handleScroll);
         })
 
         
@@ -432,9 +431,9 @@ header{
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
     margin:0 -5%;
     transition:500ms ease all;
-    /* position:fixed;
+    position:sticky;
     top:0;
-    z-index: 50; */
+    z-index: 50;
 }
 .header-breadcrumb-container{
     height: 30px;

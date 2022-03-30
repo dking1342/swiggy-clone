@@ -5,6 +5,12 @@ export enum DATASTATE {
     success = "SUCCESS"
 }
 
+export enum HELPOPTIONS {
+    partner = "Partner Onboarding",
+    legal = "Legal",
+    faqs = "FAQs"
+}
+
 
 export interface ResponseAppState<T> {
     dataState:DATASTATE,
