@@ -66,6 +66,7 @@ export default defineComponent({
         justify-content: center;
         gap:25px;
         margin-top:-50px;
+        background-color: transparent;
     }
     article img{
         width: 80%;

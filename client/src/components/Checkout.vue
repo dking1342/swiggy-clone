@@ -608,12 +608,14 @@ export default defineComponent({
     .order-item{
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        /* justify-content: space-between; */
+        gap:10px;
     }
     .order-item span:first-child{
         font-size: 14px;
         font-weight: 600;
-        width: 130px;
+        /* width: 130px; */
+        flex:50%;
         height: 100%;
         display: flex;
         align-items: center;
@@ -624,10 +626,11 @@ export default defineComponent({
         display: grid;
         grid-template-columns: repeat(3,1fr);
         grid-auto-rows: 25px;
-        width: 70px;
+        /* width: 70px; */
         align-items: center;
         justify-items: center;
         border:1px solid #60b246;
+        flex:25%;
     }
     .order-btn-container button{
         width: 100%;
@@ -650,6 +653,8 @@ export default defineComponent({
     .order-cost{
         font-size: 13px;
         color:#7e808c;
+        flex:5%;
+        text-align: right;
     }
 
     .order-totals-container{

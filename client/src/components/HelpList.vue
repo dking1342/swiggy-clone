@@ -68,7 +68,6 @@ export default defineComponent({
         justify-content: space-between;
         width: 100%;
         padding:0 50px 0 0;
-        height: 40px;
     }
     .content-btn{
         width: 100%;

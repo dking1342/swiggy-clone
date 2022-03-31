@@ -7,13 +7,13 @@
         <div class="menu-card" v-for="dishes in filterDishes.value" :key="dishes.menu_id">
             <MenuItem 
                 :menu="dishes"
-                :menuList="filterDishes"
+                :menuList="menuList"
             />
         </div>        
     </div>
     <div v-else>
         <div class="menu-items-header">
-            <h1 :id="headerId">{{ headerText }}</h1>
+            <h1 :id="headerId" style="scroll-margin-top:250px">{{ headerText }}</h1>
             <p>{{ menuList.value.appData.data.filter(x=> x.menu_category === menuCategory).length }} items</p>
         </div>
         <div class="menu-card" v-for="menu in menuList.value.appData.data.filter(x=>x.menu_category === menuCategory)" :key="menu.menu_id">
@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import { Order } from '@/types/fetch-types';
-import { computed, defineComponent,  } from 'vue';
+import { computed, defineComponent, ref,  } from 'vue';
 import MenuItem from './MenuItem.vue';
 import { useStore } from 'vuex';
 
@@ -44,12 +44,14 @@ export default defineComponent({
         menuCategory:String,
         filterDishes:Object
     },
-    setup () {
+    setup (props) {
         const store = useStore();
         const orderList = computed<Order>(()=> store.state.cart.order);
+        let filterDishesRef = ref(props.menuList);
 
         return {
             orderList,
+            filterDishesRef
         }
     }
 })
@@ -133,94 +135,8 @@ export default defineComponent({
     .menu-card:last-child{
         border-bottom: none;
     }
-    /* .menu-card-body{
-        display: flex;
-        flex-direction: column;
-        gap:10px;
-        align-items: flex-start;
-        justify-content: center;
-    }
-    .menu-card-body div{
-        width: 100%;
-    }
-    .menu-card-body span{
-        font-size: 12px;
-        color:#ee9c00;
-        font-weight: 500;
-    }
-    .menu-card-body h2{
-        font-size: 18px;
-        font-weight: 500;
-        color:#3e4152;
-        word-break:break-all;
-    }
-    .menu-card-body h3{
-        font-size: 14px;
-        font-weight: 400;
-        color:#3e4152;
-    }
-    .menu-card-body p{
-        color:rgba(40,44,63,.45);
-        font-size: 12px;
-    }
-    .menu-card-img{
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-    .menu-card-img-wrapper img{
-        width: 100%;
-        object-fit: contain;
-    }
-    .menu-card-btn-wrapper{
-        border:0.5px solid #ccc;
-        width: 75%;
-        height: 35px;
-        transform:translateY(-25px);
-    }
-    .init-btn{
-        width: 100%;
-        height: 100%;
-        background-color: #fff;
-        outline:none;
-        border:none;
-        text-transform: uppercase;
-        font-weight: 700;
-        color:#60b246;
-    }
-    .menu-card-btn-tray{
-        width: 100%;
-        height: 100%;
-        display: grid;
-        grid-template-columns: repeat(3,1fr);
-        background-color: #fff;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-    .menu-card-btn-tray .add-btn,
-    .menu-card-btn-tray .decrease-btn{
-        outline:none;
-        border:none;
-        background:transparent;
-        cursor: pointer;
-        font-size: 18px;
-        font-weight: 500;
-    }
-    .add-btn{
-        color:#60b246;
-    }
-    .decrease-btn{
-        color:#bebfc5;
-    }
-    .menu-card-btn-tray span{
-        font-size: 12px;
-        font-weight: 500;
-        color:#60b246;
-    } */
+
+
 
     @media (max-width:1150px) {
     .menu-container{

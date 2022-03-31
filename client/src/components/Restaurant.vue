@@ -63,12 +63,12 @@
             <section class="menu-container">
                 <aside class="menu-categories-container">
                     <ul>
-                        <li v-if="userFilter"><a href="#search" @click="categoryScroll">Search</a></li>
-                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'BR').length"><a href="#breakfast" @click="categoryScroll">Breakfast</a></li>
-                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'M').length"><a href="#main" @click="categoryScroll">Main</a></li>
-                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'S').length"><a href="#sides" @click="categoryScroll">Side</a></li>
-                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'D').length"><a href="#desserts" @click="categoryScroll">Desserts</a></li>
-                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'B').length"><a href="#beverages" @click="categoryScroll">Beverages</a></li>
+                        <li v-if="userFilter"><a href="#" @click="categoryScroll">Search</a></li>
+                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'BR').length"><a href="#breakfast" >Breakfast</a></li>
+                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'M').length"><a href="#main" >Main</a></li>
+                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'S').length"><a href="#sides" >Side</a></li>
+                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'D').length"><a href="#desserts" >Desserts</a></li>
+                        <li v-if="menuList.appData.data.filter(x=>x.menu_category === 'B').length"><a href="#beverages" >Beverages</a></li>
                     </ul>
                 </aside>
                 <article class="menu-items-container">
@@ -136,10 +136,10 @@
                         </div>
                     </div>
                 </aside>
-                <div class="view-btn-toggle">
+                <!-- <div class="view-btn-toggle">
                     <button v-if="!isToggled" @click="toggleView" class="menu-to-checkout">🧺</button>
                     <button v-if="isToggled" @click="toggleView" class="checkout-to-menu">X</button>
-                </div>
+                </div> -->
             </section>
             <section class="menu-info-container">
                 <div class="menu-info-top-row-container">
@@ -239,55 +239,8 @@ export default defineComponent({
             menuArray.value = menuList.value.appData!.data;
             store.dispatch('cart/addToCartAction',{id,menuList:menuArray});
         }
-        const categoryScroll = (e:any) => {
-            e.preventDefault();
-            let breakfast = document.querySelector('#breakfast') as HTMLDivElement;
-            let main = document.querySelector('#main') as HTMLDivElement;
-            let sides = document.querySelector('#sides') as HTMLDivElement;
-            let desserts = document.querySelector('#desserts') as HTMLDivElement;
-            let beverages = document.querySelector('#beverages') as HTMLDivElement;
-            let menu = document.querySelector('.menu-items-container') as HTMLDivElement;
-
-            switch (e.target.textContent) {
-                case 'Search':
-                    menu.scrollTo({
-                        behavior:'smooth',
-                        top:0
-                    })
-                    break;
-                case 'Breakfast':
-                    menu.scrollTo({
-                        behavior:'smooth',
-                        top:breakfast.offsetTop
-                    })
-                    break;
-                case 'Main':
-                    menu.scrollTo({
-                        behavior:'smooth',
-                        top:main.offsetTop
-                    })                 
-                    break;
-                case 'Side':
-                    menu.scrollTo({
-                        top:sides.offsetTop,
-                        behavior:'smooth'
-                    })                    
-                    break;
-                case 'Desserts':
-                    menu.scrollTo({
-                        top:desserts.offsetTop,
-                        behavior:'smooth'
-                    })                                        
-                    break;
-                case 'Beverages':
-                    menu.scrollTo({
-                        top:beverages.offsetTop,
-                        behavior:'smooth'
-                    })                                        
-                    break;
-                default:
-                    return;
-            }
+        const categoryScroll = () => {
+            window.scrollTo({behavior:'smooth',top:0})            
         }
         const checkout = () => {
             // check cart to see if all items are from the same restaurant
@@ -301,17 +254,29 @@ export default defineComponent({
             }
         }
         const handleScroll = () => {
-            // let headerElement = document.querySelector('header') as HTMLElement;
-            // let bodyElement = document.querySelector('.restaurant-body') as HTMLDivElement;
-            // if(window.scrollY > 80 && window.innerWidth > 890){
-            //     headerElement.classList.add('navbar-sticky');
-            //     bodyElement.classList.add('restaurant-body-sticky');
-            // } else {
-            //     headerElement.classList.remove('navbar-sticky');
-            //     bodyElement.classList.remove('restaurant-body-sticky');
-            // }
-            
+            let headerElement = document.querySelector('header') as HTMLElement;
+            let headerContainer = document.querySelector('.header-main-container') as HTMLElement;
+            let headerMainContent = document.querySelector('.header-main-content') as HTMLElement;
+            let headerMainContentH1 = document.querySelector('.header-main-content h1') as HTMLElement;
+
+            if(headerElement.offsetParent){
+                if(headerElement.offsetParent!.getBoundingClientRect().top < 95 && headerElement.offsetParent!.getBoundingClientRect().top > -10000){
+                    headerElement.style.position="sticky";
+                    headerElement.style.top="0px";
+                    headerContainer.style.gridTemplateRows="150px";
+                    headerMainContent.style.gap="0px";
+                    headerMainContentH1.style.fontSize="24px";
+    
+                } else {
+                    headerElement.style.position="unset";
+                    headerElement.style.top="0px";
+                    headerContainer.style.gridTemplateRows="250px";
+                    headerMainContent.style.gap="10px";
+                    headerMainContentH1.style.fontSize="34px";
+                }
+            }
         }
+ 
 
         // computed functions
         const filterDishes = computed(()=> 
@@ -394,6 +359,7 @@ export default defineComponent({
         const searchProps = {
             headerId:"search",
             headerText:"Search",
+            menuList,
             filterDishes:filterDishes,
             orderList
         };
@@ -431,9 +397,10 @@ header{
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
     margin:0 -5%;
     transition:500ms ease all;
-    position:sticky;
-    top:0;
+    position:unset;
+    top:0px;
     z-index: 50;
+    transition:200ms ease all;
 }
 .header-breadcrumb-container{
     height: 30px;
@@ -586,19 +553,16 @@ header{
     grid-template-columns: 1fr 2fr 1fr;
     gap:20px;
     margin-top: 30px;
-    min-height: 500px;
-    max-height: 70vh;
-    overflow:hidden;
-    position:relative;
     z-index: 4;
+    align-items: start;
 }
 .menu-categories-container{
     display: flex;
     align-items: flex-start;
     justify-content: end;
-    min-height: 500px;
-    max-height: 70vh;
-    overflow: scroll;
+    position:sticky;
+    top:240px;
+    align-self: flex-start;
 }
 .menu-categories-container ul{
     text-align: right;
@@ -623,11 +587,6 @@ header{
     color:orange;
     border-right: 5px solid orange;
     transition:all .3s ease;
-}
-.menu-items-container{
-    min-height: 500px;
-    max-height: 70vh;
-    overflow: scroll;
 }
 .menu-items-header{
     margin-bottom: 30px;
@@ -658,9 +617,11 @@ header{
 }
 
 .cart-container{
-    max-height: 70vh;
-    min-height: 500px;
+    max-height: 500px;
+    min-height: 250px;
     overflow: scroll;
+    position:sticky;
+    top:240px;
 }
 .cart-empty-container{
     width: 100%;
@@ -705,7 +666,8 @@ header{
     color:#fa4a5b;
 }
 .cart-receipt-list{
-    max-height: 280px;
+    max-height: 200px;
+    min-height: 150px;
     overflow: scroll;
     display: flex;
     flex-direction: column;
@@ -908,14 +870,16 @@ header{
 
 @media (max-width:850px) {
     .menu-container{
-        grid-template-columns: 3fr 2fr;
+        grid-template-columns: 1fr;
         grid-template-rows: 40px auto;
     }
     .menu-categories-container{
-        grid-column: 1/3;
+        grid-column: 1/-1;
+        top:350px;
+        z-index: 12;
+        background-color: #fff;
         height: 100%;
-        max-height: 100%;
-        min-height: 100%;
+        overflow: scroll;
     }
     .menu-categories-container ul{
         display: flex;
@@ -923,18 +887,13 @@ header{
         overflow: scroll;
     }
     .menu-items-container{
-        max-height: 50vh;
-        grid-column: 1/3;
+        grid-column: 1/-1;
         grid-row: 2/3;
         z-index: 10;
         background-color: #fff;
     }
     .cart-container{
-        max-height: 50vh;
-        grid-column: 1/3;
-        grid-row: 2/3;
-        z-index: -10;
-        background-color: #fff;
+        display: none;
     }
     .cart-empty-img{
         width: 300px;
@@ -969,6 +928,10 @@ header{
         gap:15px;
         align-items: flex-start;
         /* height: 100%; */
+    }
+    .menu-categories-container{
+        top:310px;
+        overflow: scroll;
     }
 
     .header-main-content{

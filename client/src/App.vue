@@ -29,6 +29,9 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
+html {
+  scroll-behavior: smooth;
+}
 a{
   text-decoration: none;
 }
@@ -38,9 +41,9 @@ button{
 main{
   height: 100%;
   width: 100%;
-  /* overflow-y: scroll; */
   margin-top: 95px;
   padding:0 5%;
   z-index: -1;
 }
+
 </style>
